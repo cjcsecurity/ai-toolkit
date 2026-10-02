@@ -1,0 +1,15 @@
+# Downloaded sources, runtimes and generated private state
+/repos/
+/runtime/
+/state/
+/index.sqlite3*
+/.index-*.sqlite3*
+/.ai-toolkit.json
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store

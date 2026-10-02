@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Start an explicitly installed Chrome DevTools MCP; never download a runtime."""
+import os
+from pathlib import Path
+import shutil
+import sys
+
+if sys.version_info < (3, 11):
+    raise SystemExit('ai-toolkit requires Python 3.11 or newer.')
+
+
+def executable(variable, default=None):
+    value = os.environ.get(variable, default)
+    found = shutil.which(value) if value else None
+    if not found:
+        raise SystemExit(f'Set {variable} to an existing executable; install the Chrome prerequisites explicitly.')
+    return found
+
+
+entry = os.environ.get('TOOLKIT_CHROME_MCP_ENTRY')
+if not entry or not Path(entry).expanduser().is_file():
+    raise SystemExit('Set TOOLKIT_CHROME_MCP_ENTRY to an existing Chrome DevTools MCP JavaScript entry point. Install the runtime explicitly; this launcher never downloads packages.')
+node = executable('TOOLKIT_NODE', 'node')
+chrome = executable('TOOLKIT_CHROME_EXECUTABLE')
+# Prevent callers from replacing the isolated browser or enabling telemetry.
+protected = {'headless', 'isolated', 'executablepath', 'userdatadir',
+             'browserurl', 'wsendpoint', 'autoconnect', 'channel',
+             'usagestatistics', 'performancecrux', 'noisolated', 'noheadless',
+             'nousagestatistics', 'noperformancecrux'}
+if any(arg.split('=', 1)[0].replace('-', '').lower() in protected for arg in sys.argv[1:]):
+    raise SystemExit('Browser connection, profile, headless mode and telemetry options are controlled by this isolated launcher.')
+os.environ['CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS'] = '1'
+os.environ['CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS'] = '1'
+os.execv(node, [node, str(Path(entry).expanduser().resolve()), '--headless', '--isolated',
+                '--executable-path', chrome, '--no-usage-statistics', '--no-performance-crux',
+                *sys.argv[1:]])
