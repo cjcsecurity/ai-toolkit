@@ -15,6 +15,7 @@ Compare systems first, then retrieve the precise instructions your task needs. S
 
 - [Start small](#start-small)
 - [How discovery works](#how-discovery-works)
+- [RAG for your agent](#rag-for-your-agent)
 - [Tool catalog — all 60 tools](#tool-catalog)
 - [Connect your agent](#connect-your-agent)
 - [Availability is explicit](#availability-is-explicit)
@@ -72,6 +73,20 @@ bin/toolkit select playwright --project /path/to/project
 ```
 
 Repository-first discovery keeps a large skill bundle from taking every comparison slot. Ranking supplies candidates; the agent or reader still checks fit, requirements, and alternatives. Project selection records preferences and does not install packages or activate services.
+
+## RAG for your agent
+
+Ask for a project recommendation with source evidence:
+
+```bash
+bin/toolkit --budget 16000 recommend \
+  "End-to-end browser tests for my TypeScript application" \
+  --constraints "Headless CI; inspect installation requirements"
+```
+
+Local keyword and vector search retrieve repository summaries and internal skills/docs. The RAG service combines them into a diverse evidence bundle with source paths, line ranges, commit verification, prerequisites and explicit fallback status. Your agent generates the recommendation from that evidence. Constraints are context for the agent to assess, not automatic compatibility filters.
+
+Shell-capable agents use the CLI; MCP-compatible hosts can use the optional stdio server's five tools. See the [RAG guide](docs/rag.md) for architecture, setup, host configuration and evaluation, and the [agent demonstration](docs/rag-demo.md) for a sourced answer from a real MCP session.
 
 ## Tool catalog
 
@@ -204,6 +219,7 @@ The default output budget is **8,000 characters**, not tokens. Put `--budget` be
 | --- | --- |
 | [Wiki home](docs/wiki/Home.md) | Overview and how the documentation fits together |
 | [Getting started](docs/wiki/Getting-Started.md) | Small lexical install, full semantic install, and first searches |
+| [RAG and agent recommendations](docs/rag.md) | Cited evidence, MCP access, evaluation and limitations |
 | [Retrieval system](docs/wiki/Retrieval-System.md) | Corpus, local embeddings, keyword search, scoring, and limits |
 | [Codex and OpenCode](docs/wiki/Codex-and-OpenCode.md) | Client registration, global instructions, and on-demand skills |
 | [Runtime setup](docs/wiki/Runtime-Setup.md) | Application dependencies and optional MCP adapters |

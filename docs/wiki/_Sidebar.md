@@ -1,6 +1,8 @@
 - [Home](Home.md)
 - [Getting started](Getting-Started.md)
 - [All 60 tools](Tool-Catalog.md)
+- [RAG recommendations](../rag.md)
+- [Agent demonstration](../rag-demo.md)
 - [Retrieval system](Retrieval-System.md)
 - [Codex and OpenCode](Codex-and-OpenCode.md)
 - [Runtime setup](Runtime-Setup.md)

@@ -24,6 +24,12 @@ Search uses a pinned local MiniLM model with no query API or background service.
 
 Default output is capped at 8,000 characters. `--budget` precedes the command, e.g. `toolkit --budget 4000 docs scrapling "CSS selectors"`. `read --offset N` continues a long file. Read only relevant files; don't dump the catalog, all skill bodies, or an entire repository into context. Reuse a selection until the task changes or a capability is missing.
 
+## Project recommendations with evidence
+
+For a project-level recommendation, use `toolkit --budget 16000 recommend "project outcome" --constraints "known requirements"`, adding `--project /absolute/project` to include saved selections. This combines repository discovery with internal capability evidence. Compare prerequisites, cite returned sources, inspect provenance/fallback warnings, and read complete selected setup guides. Constraints are supplied for your judgment, not enforced compatibility filters. Scores are not confidence; report insufficient evidence when results do not support a fit.
+
+MCP hosts can launch `toolkit-rag-mcp` after installing the optional SDK dependencies. Its `recommend_tools`, `search_tools`, `get_tool`, `read_tool_source` and `search_status` tools share the same read-only service. Source and catalog reads are paginated; continue until `next_offset` is null. See the [RAG guide](../../docs/rag.md) for setup. RAG reads require an explicitly built index; they never rebuild or install tools automatically.
+
 ## Optional engineering runtimes
 
 No third-party application runtime is bundled or automatically provisioned. Use `toolkit show ID` for its upstream prerequisites and setup guide, then check what actually exists on this machine. Recommended shared capabilities include Codebase Memory for graphs, Serena for semantic code navigation, and Chrome DevTools for isolated browser work. Frontend guidance is available in Impeccable; selected Addy Osmani skills cover API design and observability. Preserve the host's existing workflow; Superpowers is an optional separate upstream plugin.
