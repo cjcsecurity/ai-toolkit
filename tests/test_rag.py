@@ -229,6 +229,9 @@ class RagTests(unittest.TestCase):
 
 
 class RagPortabilityTests(unittest.TestCase):
+    def test_quoted_home_directory_root_matches_library_resolution(self):
+        self.assertEqual(RagService('~').library.root, Path.home().resolve())
+
     def test_relative_sources_work_from_an_unrelated_directory(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder) / 'toolkit with spaces'

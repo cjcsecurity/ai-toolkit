@@ -108,7 +108,7 @@ def page(text, metadata, offset, budget):
 
 class RagService:
     def __init__(self, root=ROOT):
-        self.library = Library(Path(root).resolve())
+        self.library = Library(root)
         self._lock = threading.RLock()
         self._embedder = None
         self._model_signature = None
