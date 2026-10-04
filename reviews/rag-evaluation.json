@@ -1,0 +1,2297 @@
+{
+  "schema_version": 1,
+  "evaluated_at": "2026-10-04T05:47:03.392333+00:00",
+  "dataset_sha256": "5623aad85c22da49a69c5a80ff487d2c5b86f4299cb941708109fa12cce044c1",
+  "index_sha256": "858dfe2f256d11b7ed456acfd75b76c80c1bc3e5c7ae531f9b1749cde84d1b29",
+  "limit": 5,
+  "budget": 64000,
+  "implementation_sha256": {
+    "rag.py": "386ede5459c6149d90e14eb225fa4733a959fedb39dd2a8e1cc9c01c0ff094b5",
+    "rag_sources.py": "dfc3fc804dadd80585b1a559a73310ad0f50fa1a9055058899d43d60804169c8",
+    "hybrid.py": "499a3a2f5af0393156b49753115c78f8724fdc6f31fb18bde512a9740f31fa92",
+    "corpus.py": "d440fcd0b1ff3c662a59080886fae368eda2cf69da75f953826417d2eb2540e9",
+    "embeddings.py": "66bf7ce7475f643afd336f1fc20ee759815961d5b82843a2f5ae52f023bad881",
+    "evals/run.py": "bf8c91d09fe455abc47fbf898402de0781b2f4e267a5e6eb5e25216f543e02d3"
+  },
+  "notes": [
+    "Labels identify designated relevant sources, not all relevant results; hit@k is not recall.",
+    "Development labels predate this extension; holdout labels were written before this evaluation.",
+    "Holdout denotes new repository-selection labels, not wholly unseen query phrasing; adaptive_parser overlaps a development case.",
+    "Fresh service per mode; first query includes lazy model initialization. Subsequent queries reuse it.",
+    "Times include retrieval, source verification and JSON budget assembly, but exclude subprocess/host startup.",
+    "Unsupported-query results are observations, not a calibrated abstention score.",
+    "Constraint satisfaction and generated-answer faithfulness require separate review."
+  ],
+  "runs": [
+    {
+      "requested_mode": "lexical",
+      "cases": [
+        {
+          "id": "quiet_editorial_ui",
+          "split": "development",
+          "task": "search",
+          "query": "Make this busy dashboard feel like a calm printed journal with generous blank space and muted colors",
+          "expected": [
+            {
+              "repo_id": "taste-skill",
+              "path_prefixes": [
+                "skills/minimalist-skill/SKILL.md"
+              ],
+              "names": [
+                "minimalist-ui"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.1308,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "open-design",
+              "name": "high-end-visual-design",
+              "kind": "skill",
+              "path": "skills/soft-skill/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "Animation Patterns Reference / Effect-to-Feeling Guide",
+              "kind": "doc",
+              "path": "skills/frontend-slides/animation-patterns.md"
+            },
+            {
+              "id": "open-design",
+              "name": "imagegen-frontend-mobile",
+              "kind": "skill",
+              "path": "skills/imagegen-frontend-mobile/SKILL.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Animation Patterns Reference / Effect-to-Feeling Guide",
+              "kind": "doc",
+              "path": "plugins/_official/examples/frontend-slides/references/animation-patterns.md"
+            },
+            {
+              "id": "taste-skill",
+              "name": "imagegen-frontend-mobile",
+              "kind": "skill",
+              "path": "skills/imagegen-frontend-mobile/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "stable_client_contract",
+          "split": "development",
+          "task": "search",
+          "query": "Let other teams keep using our service when we add features without forcing everyone to upgrade together",
+          "expected": [
+            {
+              "repo_id": "agent-skills",
+              "path_prefixes": [
+                "skills/api-and-interface-design/SKILL.md"
+              ],
+              "names": [
+                "api-and-interface-design"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.6656,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc",
+              "name": "dev-team",
+              "kind": "skill",
+              "path": "skills/dev-team/SKILL.md"
+            },
+            {
+              "id": "gh-aw",
+              "name": "Alternative 1: Top-level `auto_upgrade_cron` string field / Alternative 2: Separate top-level `auto_upgrade_schedule` object / Consequences / Positive",
+              "kind": "doc",
+              "path": "docs/adr/46521-configurable-auto-upgrade-cron-schedule.md"
+            },
+            {
+              "id": "ecc",
+              "name": "git-workflow",
+              "kind": "skill",
+              "path": "skills/git-workflow/SKILL.md"
+            },
+            {
+              "id": "gh-aw",
+              "name": "3. Use Descriptive File Names / 4. Keep Related Code Together / When to Create New Files / Create a New File When:",
+              "kind": "doc",
+              "path": "scratchpad/code-organization.md"
+            },
+            {
+              "id": "open-design",
+              "name": "redesign-existing-projects",
+              "kind": "skill",
+              "path": "skills/redesign-skill/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "production_visibility",
+          "split": "development",
+          "task": "search",
+          "query": "Next time checkout fails I want to know which service took too long and why the payment was rejected",
+          "expected": [
+            {
+              "repo_id": "agent-skills",
+              "path_prefixes": [
+                "skills/observability-and-instrumentation/SKILL.md"
+              ],
+              "names": [
+                "observability-and-instrumentation"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.2766,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "agent-skills",
+              "name": "observability-and-instrumentation",
+              "kind": "skill",
+              "path": "skills/observability-and-instrumentation/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "Session File Format",
+              "kind": "doc",
+              "path": "commands/save-session.md"
+            },
+            {
+              "id": "promptfoo",
+              "name": "Example Test Cases / Evaluation Criteria / Why Test for Unverifiable Claims",
+              "kind": "doc",
+              "path": "site/docs/red-team/plugins/unverifiable-claims.md"
+            },
+            {
+              "id": "gh-aw",
+              "name": "Step 10: Return structured result / Output Format",
+              "kind": "doc",
+              "path": ".github/workflows/daily-safeoutputs-git-simulator.md"
+            },
+            {
+              "id": "voicestudio",
+              "name": "14. \"Can't reach the local backend\" *during* generation / transcription / dubbing",
+              "kind": "doc",
+              "path": "docs/install/troubleshooting.md"
+            }
+          ]
+        },
+        {
+          "id": "resume_session",
+          "split": "development",
+          "task": "search",
+          "query": "I closed yesterday's conversation; help me continue from the unanswered question in this project",
+          "expected": [
+            {
+              "repo_id": "agentmemory",
+              "path_prefixes": [
+                "plugin/skills/handoff/SKILL.md"
+              ],
+              "names": [
+                "handoff"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 2,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.6733,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "browser-harness",
+              "name": "Brand voice — what to put in answers / What to put in the Knowledge Base / Top unanswered questions / Query log",
+              "kind": "doc",
+              "path": "agent-workspace/domain-skills/shopify-admin/knowledge-base.md"
+            },
+            {
+              "id": "agentmemory",
+              "name": "handoff",
+              "kind": "skill",
+              "path": "plugin/skills/handoff/SKILL.md"
+            },
+            {
+              "id": "openalice",
+              "name": "Mode C: a fresh worker per fire",
+              "kind": "doc",
+              "path": "docs/conversation-provenance.md"
+            },
+            {
+              "id": "opencli",
+              "name": "Stack Overflow / Commands / Listing columns",
+              "kind": "doc",
+              "path": "docs/adapters/browser/stackoverflow.md"
+            },
+            {
+              "id": "open-design",
+              "name": "od-default",
+              "kind": "skill",
+              "path": "plugins/_official/scenarios/od-default/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "past_decisions",
+          "split": "development",
+          "task": "search",
+          "query": "Have we dealt with this problem before and what did we decide in earlier conversations",
+          "expected": [
+            {
+              "repo_id": "agentmemory",
+              "path_prefixes": [
+                "plugin/skills/recall/SKILL.md"
+              ],
+              "names": [
+                "recall"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.9407,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ruflo",
+              "name": "📋 Spec-Driven Development / 🧠 Learning & Intelligence / 🧠 Infinite Context & Memory Optimization / The Problem",
+              "kind": "doc",
+              "path": "docs/USERGUIDE.md"
+            },
+            {
+              "id": "langfuse",
+              "name": "Ordering / Conversation history and current turn",
+              "kind": "doc",
+              "path": "packages/shared/src/server/transcript/README.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "The gates can't tell you it's good",
+              "kind": "doc",
+              "path": "docs/prompting/iterating.mdx"
+            },
+            {
+              "id": "ecc",
+              "name": "What have they tried before and why did it fall short?",
+              "kind": "doc",
+              "path": "skills/brand-discovery/references/30_audience-niche.md"
+            },
+            {
+              "id": "open-code-review",
+              "name": "\"Why was this file silent?\" / \"What did compression keep / drop?\"",
+              "kind": "doc",
+              "path": "pages/src/content/docs/en/viewer.md"
+            }
+          ]
+        },
+        {
+          "id": "spoofed_sender",
+          "split": "development",
+          "task": "search",
+          "query": "Someone sent our accountant a message pretending to be the boss; figure out where it really came from",
+          "expected": [
+            {
+              "repo_id": "anthropic-cybersecurity-skills",
+              "path_prefixes": [
+                "skills/analyzing-email-headers-for-phishing-investigation/SKILL.md"
+              ],
+              "names": [
+                "analyzing-email-headers-for-phishing-investigation"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.1905,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc",
+              "name": "email-ops",
+              "kind": "skill",
+              "path": "skills/email-ops/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "email-ops",
+              "kind": "skill",
+              "path": "docs/ja-JP/skills/email-ops/SKILL.md"
+            },
+            {
+              "id": "promptfoo",
+              "name": "CPNI Disclosure",
+              "kind": "doc",
+              "path": "site/docs/red-team/plugins/telecom.md"
+            },
+            {
+              "id": "agent-reach",
+              "name": "环境体检与恢复（抓取前必查）",
+              "kind": "doc",
+              "path": "agent_reach/skill/references/career.md"
+            },
+            {
+              "id": "agent-reach",
+              "name": "Boss直聘",
+              "kind": "doc",
+              "path": "agent_reach/skill/references/career.md"
+            }
+          ]
+        },
+        {
+          "id": "lp_statement_check",
+          "split": "development",
+          "task": "search",
+          "query": "Check whether the LP ending capital statement agrees with the NAV pack and flag rounding differences",
+          "expected": [
+            {
+              "repo_id": "financial-services",
+              "path_prefixes": [
+                "plugins/vertical-plugins/fund-admin/skills/nav-tieout/SKILL.md",
+                "plugins/agent-plugins/statement-auditor/skills/nav-tieout/SKILL.md"
+              ],
+              "names": [
+                "nav-tieout"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.0855,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "financial-services",
+              "name": "nav-tieout",
+              "kind": "skill",
+              "path": "plugins/vertical-plugins/fund-admin/skills/nav-tieout/SKILL.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "statement-auditor",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "Workflow",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "What you produce",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "Managed-agent templates for financial services",
+              "kind": "doc",
+              "path": "managed-agent-cookbooks/README.md"
+            }
+          ]
+        },
+        {
+          "id": "options_visual",
+          "split": "development",
+          "task": "search",
+          "query": "Show how my iron condor gains or loses money as the stock price and days remaining change",
+          "expected": [
+            {
+              "repo_id": "finance-skills",
+              "path_prefixes": [
+                "plugins/market-analysis/skills/options-payoff/SKILL.md"
+              ],
+              "names": [
+                "options-payoff"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.3287,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "finance-skills",
+              "name": "options-payoff",
+              "kind": "skill",
+              "path": "plugins/market-analysis/skills/options-payoff/SKILL.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "sepa-strategy",
+              "kind": "skill",
+              "path": "plugins/market-analysis/skills/sepa-strategy/SKILL.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "Phase 1: Initial Hard Stop (At Entry) / Phase 2: Move to Breakeven (At +8% Profit) / Phase 3: Trailing Stop (At +15% Profit) / Special Case: Rapid Advance / Stop Level Summary",
+              "kind": "doc",
+              "path": "plugins/market-analysis/skills/sepa-strategy/references/position-sizing.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "Calendar Spread (Time Spread) / Iron Condor",
+              "kind": "doc",
+              "path": "plugins/market-analysis/skills/options-payoff/references/strategies.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "Iron Rules / Pyramiding (Adding to Winners) / How to Pyramid / Why Pyramiding Works",
+              "kind": "doc",
+              "path": "plugins/market-analysis/skills/sepa-strategy/references/position-sizing.md"
+            }
+          ]
+        },
+        {
+          "id": "named_scrape_options",
+          "split": "development",
+          "task": "search",
+          "query": "Firecrawl /scrape onlyMainContent maxAge 0 metadata.cacheState integration",
+          "expected": [
+            {
+              "repo_id": "firecrawl",
+              "path_prefixes": [
+                "skills/firecrawl-build-scrape/SKILL.md"
+              ],
+              "names": [
+                "firecrawl-build-scrape"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.6154,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "firecrawl",
+              "name": "firecrawl-build-scrape",
+              "kind": "skill",
+              "path": "skills/firecrawl-build-scrape/SKILL.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Freshness and Liveness / `maxAge` and the Cache Tradeoff / Verifying What You Got",
+              "kind": "doc",
+              "path": "skills/firecrawl-build-scrape/references/freshness-and-liveness.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Firecrawl PHP SDK / Requirements / Installation / Quick Start / Environment Variables / Usage / Scrape",
+              "kind": "doc",
+              "path": "apps/php-sdk/README.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Firecrawl .NET SDK / Installation / Quick Start / Configuration / API Key / Usage / Scrape",
+              "kind": "doc",
+              "path": "apps/dot-net-sdk/README.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Extract website data using LLMs / Setup / Getting your Groq and Firecrawl API Keys / Load website with Firecrawl",
+              "kind": "doc",
+              "path": "examples/web_data_extraction/web-data-extraction-using-llms.mdx"
+            }
+          ]
+        },
+        {
+          "id": "portable_soc_queries",
+          "split": "development",
+          "task": "search",
+          "query": "Convert pySigma rules to Splunk and Microsoft Sentinel queries for our SOC",
+          "expected": [
+            {
+              "repo_id": "anthropic-cybersecurity-skills",
+              "path_prefixes": [
+                "skills/building-detection-rules-with-sigma/SKILL.md"
+              ],
+              "names": [
+                "building-detection-rules-with-sigma"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.7295,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "building-detection-rules-with-sigma",
+              "kind": "skill",
+              "path": "skills/building-detection-rules-with-sigma/SKILL.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "API Reference: Building Detection Rules with Sigma / pySigma (sigma-cli) / Key Sigma Rule Fields / Available Backends (pySigma)",
+              "kind": "doc",
+              "path": "skills/building-detection-rules-with-sigma/references/api-reference.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "performing-purple-team-atomic-testing",
+              "kind": "skill",
+              "path": "skills/performing-purple-team-atomic-testing/SKILL.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "sigma-cli Commands / References",
+              "kind": "doc",
+              "path": "skills/building-detection-rules-with-sigma/references/api-reference.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "implementing-siem-use-cases-for-detection",
+              "kind": "skill",
+              "path": "skills/implementing-siem-use-cases-for-detection/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "mixed_document_qa",
+          "split": "development",
+          "task": "search",
+          "query": "Answer questions across diagrams tables equations and text in the same PDF document",
+          "expected": [
+            {
+              "repo_id": "rag-anything",
+              "path_prefixes": [
+                "README.md"
+              ],
+              "names": []
+            }
+          ],
+          "constraints": "",
+          "rank": 4,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.2885,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "cyberstrike",
+              "name": "T1564.005_hidden-file-system",
+              "kind": "skill",
+              "path": ".cyberstrike/skill/mitre_attack/TA0005_defense-evasion/T1564.005_hidden-file-system/SKILL.md"
+            },
+            {
+              "id": "rag-anything",
+              "name": "HKUDS/RAG-Anything",
+              "kind": "repo",
+              "path": "manifest.json"
+            },
+            {
+              "id": "promptfoo",
+              "name": "Citations / PDF Documents",
+              "kind": "doc",
+              "path": "site/docs/providers/anthropic.md"
+            },
+            {
+              "id": "rag-anything",
+              "name": "7. Direct Content List Insertion",
+              "kind": "doc",
+              "path": "README.md"
+            },
+            {
+              "id": "rag-anything",
+              "name": "Multimodal RAG: common failure modes and quick checks / 1. OCR or layout silently corrupts text / 2. Table structure lost during preprocessing / 3. Image ↔ caption misalignment",
+              "kind": "doc",
+              "path": "docs/multimodal_rag_failure_modes.md"
+            }
+          ]
+        },
+        {
+          "id": "ui_audit_duplicates",
+          "split": "development",
+          "task": "search",
+          "query": "Audit accessibility keyboard focus contrast reduced motion and mobile touch targets in the frontend",
+          "expected": [
+            {
+              "repo_id": "impeccable",
+              "path_prefixes": [
+                ".agents/skills/impeccable/SKILL.md",
+                ".agents/skills/impeccable/reference/audit.md"
+              ],
+              "names": [
+                "impeccable"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.2139,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "archify",
+              "name": "Visual language and density / Mobile and touch / Motion",
+              "kind": "doc",
+              "path": "journal/research-visual-evolution-round-28.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Composition / Accessibility & Responsiveness / 6. Motion & Interaction",
+              "kind": "doc",
+              "path": "design-systems/webex/DESIGN.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Composition / Accessibility & Responsiveness / 6. Motion & Interaction",
+              "kind": "doc",
+              "path": "design-systems/cisco/DESIGN.md"
+            },
+            {
+              "id": "ecc",
+              "name": "frontend-a11y",
+              "kind": "skill",
+              "path": "skills/frontend-a11y/SKILL.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Hover States / Focus States / Transitions / 8. Responsive Behavior / Breakpoints / Touch Targets / Collapsing Strategy",
+              "kind": "doc",
+              "path": "design-systems/opencode-ai/DESIGN.md"
+            }
+          ]
+        },
+        {
+          "id": "adaptive_extraction",
+          "split": "development",
+          "task": "search",
+          "query": "Python HTML extraction that finds the same product elements after a website changes its layout",
+          "expected": [
+            {
+              "repo_id": "scrapling",
+              "path_prefixes": [
+                "agent-skill/Scrapling-Skill/SKILL.md"
+              ],
+              "names": [
+                "scrapling-official"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.6047,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "scrapling",
+              "name": "scrapling-official",
+              "kind": "skill",
+              "path": "agent-skill/Scrapling-Skill/SKILL.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Step 4: Scrape the input URL for product details",
+              "kind": "doc",
+              "path": "examples/blog-articles/amazon-price-tracking/notebook.md"
+            },
+            {
+              "id": "scrapling",
+              "name": "Adaptive scraping",
+              "kind": "doc",
+              "path": "docs/parsing/adaptive.md"
+            },
+            {
+              "id": "scrapling",
+              "name": "Parsing main classes",
+              "kind": "doc",
+              "path": "docs/parsing/main_classes.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Product extraction / Menu extraction / Parsing uploaded files / Crawling a Website",
+              "kind": "doc",
+              "path": "apps/js-sdk/firecrawl/README.md"
+            }
+          ]
+        },
+        {
+          "id": "browser_tests",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "End-to-end browser tests for forms navigation and screenshots in a TypeScript web application",
+          "expected": [
+            {
+              "repo_id": "playwright"
+            }
+          ],
+          "constraints": "Headless browser testing in CI",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.8493,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "playwright"
+            },
+            {
+              "id": "pentagi"
+            },
+            {
+              "id": "browser-harness"
+            },
+            {
+              "id": "opencli"
+            },
+            {
+              "id": "cyberstrike"
+            }
+          ]
+        },
+        {
+          "id": "structural_rewrites",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Find and rewrite Python code by syntax tree patterns rather than plain text matching",
+          "expected": [
+            {
+              "repo_id": "ast-grep"
+            }
+          ],
+          "constraints": "Local CLI; no model API",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 2.3882,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ast-grep"
+            },
+            {
+              "id": "humanizer"
+            },
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "semgrep"
+            },
+            {
+              "id": "gh-aw"
+            }
+          ]
+        },
+        {
+          "id": "pdf_ingestion",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Convert local PDF tables and scanned documents into Markdown for a RAG ingestion pipeline",
+          "expected": [
+            {
+              "repo_id": "docling"
+            }
+          ],
+          "constraints": "Local document conversion",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.7573,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "docling"
+            },
+            {
+              "id": "rag-anything"
+            },
+            {
+              "id": "scrapling"
+            },
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "huashu-design"
+            }
+          ]
+        },
+        {
+          "id": "adaptive_parser",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Python HTML extraction that finds product elements after a website changes its layout",
+          "expected": [
+            {
+              "repo_id": "scrapling"
+            }
+          ],
+          "constraints": "Use local HTML parsing when sufficient",
+          "rank": 2,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.9415,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "firecrawl"
+            },
+            {
+              "id": "scrapling"
+            },
+            {
+              "id": "hyperframes"
+            },
+            {
+              "id": "docling"
+            },
+            {
+              "id": "opencli"
+            }
+          ]
+        },
+        {
+          "id": "prompt_regressions",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Evaluate prompt changes and catch regressions across language model outputs",
+          "expected": [
+            {
+              "repo_id": "promptfoo"
+            }
+          ],
+          "constraints": "Report test results for a project",
+          "rank": 2,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.7925,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "promptfoo"
+            },
+            {
+              "id": "langfuse"
+            },
+            {
+              "id": "strix"
+            },
+            {
+              "id": "laya"
+            }
+          ]
+        },
+        {
+          "id": "llm_observability",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Trace LLM application calls and diagnose token costs and response latency",
+          "expected": [
+            {
+              "repo_id": "langfuse"
+            }
+          ],
+          "constraints": "Inspect self-hosting requirements before deploying",
+          "rank": 1,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 1.612,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "langfuse"
+            },
+            {
+              "id": "promptfoo"
+            },
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "pentagi"
+            },
+            {
+              "id": "codebase-memory-mcp"
+            }
+          ]
+        },
+        {
+          "id": "gibberish",
+          "split": "holdout",
+          "task": "search",
+          "query": "qzvplox nnrrtxyz blimzork",
+          "expected": [],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.2346,
+          "result_count": 0,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [],
+          "results": []
+        },
+        {
+          "id": "out_of_domain",
+          "split": "holdout",
+          "task": "search",
+          "query": "telepathic marmalade choreography for purple moon hamsters",
+          "expected": [],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "lexical",
+          "fallback_reason": null,
+          "seconds": 0.2999,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "open-design",
+              "name": "stitch-design-taste",
+              "kind": "skill",
+              "path": "skills/stitch-skill/SKILL.md"
+            },
+            {
+              "id": "taste-skill",
+              "name": "stitch-design-taste",
+              "kind": "skill",
+              "path": "skills/stitch-skill/SKILL.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Choreography",
+              "kind": "doc",
+              "path": "skills/hyperframes-animation/rules/waterfall-entry.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Choreography / Mount / Notes",
+              "kind": "doc",
+              "path": "registry/components/cta-close/README.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Multi-Cursor Choreography",
+              "kind": "doc",
+              "path": "skills/hyperframes-animation/rules/multi-cursor-choreography.md"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "development/search": {
+          "cases": 13,
+          "hits": 8,
+          "hit_at_k": 0.6153846153846154,
+          "mrr_at_k": 0.5192307692307693
+        },
+        "holdout/recommend": {
+          "cases": 6,
+          "hits": 6,
+          "hit_at_k": 1.0,
+          "mrr_at_k": 0.8333333333333334
+        }
+      },
+      "index": {
+        "manifest_sha256": "3cea4cdada184e82c42915e99d398b14a8d65a3bf100bb4023aea67ce1de225c",
+        "schema": "2",
+        "corpus_sha256": "19939d456645281497faeffce205860ae761b6c7ff892a56c6d45e8cb8c6da5b",
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "embedding_fingerprint_sha256": "a440dc1db832e4c8ed07e8acdce72484a4428d6981cfa2279ba948b805c7d3f5"
+      },
+      "latency": {
+        "first_query_seconds": 1.1308,
+        "subsequent_query_median_seconds": 1.2826,
+        "maximum_seconds": 2.3882
+      }
+    },
+    {
+      "requested_mode": "hybrid",
+      "cases": [
+        {
+          "id": "quiet_editorial_ui",
+          "split": "development",
+          "task": "search",
+          "query": "Make this busy dashboard feel like a calm printed journal with generous blank space and muted colors",
+          "expected": [
+            {
+              "repo_id": "taste-skill",
+              "path_prefixes": [
+                "skills/minimalist-skill/SKILL.md"
+              ],
+              "names": [
+                "minimalist-ui"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.2229,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "taste-skill",
+              "name": "industrial-brutalist-ui",
+              "kind": "skill",
+              "path": "skills/brutalist-skill/SKILL.md"
+            },
+            {
+              "id": "open-design",
+              "name": "industrial-brutalist-ui",
+              "kind": "skill",
+              "path": "skills/brutalist-skill/SKILL.md"
+            },
+            {
+              "id": "open-design",
+              "name": "imagegen-frontend-mobile",
+              "kind": "skill",
+              "path": "skills/imagegen-frontend-mobile/SKILL.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Theme Color Presets / How to use / 🖋 Ink Classic (Monocle default) / 🌊 Indigo Porcelain / 🌿 Forest Ink",
+              "kind": "doc",
+              "path": "design-templates/guizang-ppt/references/themes.md"
+            },
+            {
+              "id": "open-design",
+              "name": "wireframe-greybox",
+              "kind": "skill",
+              "path": "design-templates/wireframe-greybox/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "stable_client_contract",
+          "split": "development",
+          "task": "search",
+          "query": "Let other teams keep using our service when we add features without forcing everyone to upgrade together",
+          "expected": [
+            {
+              "repo_id": "agent-skills",
+              "path_prefixes": [
+                "skills/api-and-interface-design/SKILL.md"
+              ],
+              "names": [
+                "api-and-interface-design"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.232,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc",
+              "name": "hexagonal-architecture",
+              "kind": "skill",
+              "path": "skills/hexagonal-architecture/SKILL.md"
+            },
+            {
+              "id": "cyberstrike",
+              "name": "SA-22_unsupported-system-components",
+              "kind": "skill",
+              "path": ".cyberstrike/skill/NIST/SP800-53_rev5/SA_system-and-services-acquisition/SA-22_unsupported-system-components/SKILL.md"
+            },
+            {
+              "id": "cyberstrike",
+              "name": "Unsupported System Components (03.16.02)_unsupported-system-components",
+              "kind": "skill",
+              "path": ".cyberstrike/skill/NIST/SP800-171_rev3/03.16_system-and-services-acquisition/unsupported-system-components-03-16-02/SKILL.md"
+            },
+            {
+              "id": "agent-skills",
+              "name": "deprecation-and-migration",
+              "kind": "skill",
+              "path": "skills/deprecation-and-migration/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "dev-team",
+              "kind": "skill",
+              "path": "skills/dev-team/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "production_visibility",
+          "split": "development",
+          "task": "search",
+          "query": "Next time checkout fails I want to know which service took too long and why the payment was rejected",
+          "expected": [
+            {
+              "repo_id": "agent-skills",
+              "path_prefixes": [
+                "skills/observability-and-instrumentation/SKILL.md"
+              ],
+              "names": [
+                "observability-and-instrumentation"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.8155,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "agent-skills",
+              "name": "observability-and-instrumentation",
+              "kind": "skill",
+              "path": "skills/observability-and-instrumentation/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "agent-payment-x402",
+              "kind": "skill",
+              "path": "skills/agent-payment-x402/SKILL.md"
+            },
+            {
+              "id": "promptfoo",
+              "name": "Error Handling",
+              "kind": "doc",
+              "path": "site/docs/providers/azure.md"
+            },
+            {
+              "id": "ecc",
+              "name": "Session File Format",
+              "kind": "doc",
+              "path": "commands/save-session.md"
+            },
+            {
+              "id": "pentagi",
+              "name": "Update Server Scenarios",
+              "kind": "doc",
+              "path": "backend/docs/installer/checker-test-scenarios.md"
+            }
+          ]
+        },
+        {
+          "id": "resume_session",
+          "split": "development",
+          "task": "search",
+          "query": "I closed yesterday's conversation; help me continue from the unanswered question in this project",
+          "expected": [
+            {
+              "repo_id": "agentmemory",
+              "path_prefixes": [
+                "plugin/skills/handoff/SKILL.md"
+              ],
+              "names": [
+                "handoff"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.2014,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "agentmemory",
+              "name": "handoff",
+              "kind": "skill",
+              "path": "plugin/skills/handoff/SKILL.md"
+            },
+            {
+              "id": "openalice",
+              "name": "Phase 2: cross-Session collaboration",
+              "kind": "doc",
+              "path": "docs/conversation-provenance.md"
+            },
+            {
+              "id": "opencli",
+              "name": "Usage Examples",
+              "kind": "doc",
+              "path": "docs/adapters/browser/deepseek.md"
+            },
+            {
+              "id": "open-design",
+              "name": "discovery-question-form",
+              "kind": "skill",
+              "path": "plugins/_official/atoms/discovery-question-form/SKILL.md"
+            },
+            {
+              "id": "browser-harness",
+              "name": "Brand voice — what to put in answers / What to put in the Knowledge Base / Top unanswered questions / Query log",
+              "kind": "doc",
+              "path": "agent-workspace/domain-skills/shopify-admin/knowledge-base.md"
+            }
+          ]
+        },
+        {
+          "id": "past_decisions",
+          "split": "development",
+          "task": "search",
+          "query": "Have we dealt with this problem before and what did we decide in earlier conversations",
+          "expected": [
+            {
+              "repo_id": "agentmemory",
+              "path_prefixes": [
+                "plugin/skills/recall/SKILL.md"
+              ],
+              "names": [
+                "recall"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.4831,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "promptfoo",
+              "name": "How It Works / Types of Unverifiable Claims / 1. Actions That Almost Happened / 2. Private Thoughts & Feelings / 3. Undetected Problems / 4. Information About Others",
+              "kind": "doc",
+              "path": "site/docs/red-team/plugins/unverifiable-claims.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Overview / Research",
+              "kind": "doc",
+              "path": "specs/change/20260511-issue-138-conversation-run-isolation/spec.md"
+            },
+            {
+              "id": "ruflo",
+              "name": "📋 Spec-Driven Development / 🧠 Learning & Intelligence / 🧠 Infinite Context & Memory Optimization / The Problem",
+              "kind": "doc",
+              "path": "docs/USERGUIDE.md"
+            },
+            {
+              "id": "langfuse",
+              "name": "Ordering / Conversation history and current turn",
+              "kind": "doc",
+              "path": "packages/shared/src/server/transcript/README.md"
+            },
+            {
+              "id": "ruflo",
+              "name": "Common Issues",
+              "kind": "doc",
+              "path": "ruflo/src/ruvocal/docs/source/configuration/common-issues.md"
+            }
+          ]
+        },
+        {
+          "id": "spoofed_sender",
+          "split": "development",
+          "task": "search",
+          "query": "Someone sent our accountant a message pretending to be the boss; figure out where it really came from",
+          "expected": [
+            {
+              "repo_id": "anthropic-cybersecurity-skills",
+              "path_prefixes": [
+                "skills/analyzing-email-headers-for-phishing-investigation/SKILL.md"
+              ],
+              "names": [
+                "analyzing-email-headers-for-phishing-investigation"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.8198,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc",
+              "name": "email-ops",
+              "kind": "skill",
+              "path": "skills/email-ops/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "email-ops",
+              "kind": "skill",
+              "path": "docs/ja-JP/skills/email-ops/SKILL.md"
+            },
+            {
+              "id": "cyberstrike",
+              "name": "T1656_impersonation",
+              "kind": "skill",
+              "path": ".cyberstrike/skill/mitre_attack/TA0005_defense-evasion/T1656_impersonation/SKILL.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "detecting-business-email-compromise",
+              "kind": "skill",
+              "path": "skills/detecting-business-email-compromise/SKILL.md"
+            },
+            {
+              "id": "promptfoo",
+              "name": "CPNI Disclosure",
+              "kind": "doc",
+              "path": "site/docs/red-team/plugins/telecom.md"
+            }
+          ]
+        },
+        {
+          "id": "lp_statement_check",
+          "split": "development",
+          "task": "search",
+          "query": "Check whether the LP ending capital statement agrees with the NAV pack and flag rounding differences",
+          "expected": [
+            {
+              "repo_id": "financial-services",
+              "path_prefixes": [
+                "plugins/vertical-plugins/fund-admin/skills/nav-tieout/SKILL.md",
+                "plugins/agent-plugins/statement-auditor/skills/nav-tieout/SKILL.md"
+              ],
+              "names": [
+                "nav-tieout"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.6675,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "financial-services",
+              "name": "nav-tieout",
+              "kind": "skill",
+              "path": "plugins/vertical-plugins/fund-admin/skills/nav-tieout/SKILL.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "statement-auditor",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "What you produce",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "Workflow",
+              "kind": "doc",
+              "path": "plugins/agent-plugins/statement-auditor/agents/statement-auditor.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "3-statement-model",
+              "kind": "skill",
+              "path": "plugins/agent-plugins/pitch-agent/skills/3-statement-model/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "options_visual",
+          "split": "development",
+          "task": "search",
+          "query": "Show how my iron condor gains or loses money as the stock price and days remaining change",
+          "expected": [
+            {
+              "repo_id": "finance-skills",
+              "path_prefixes": [
+                "plugins/market-analysis/skills/options-payoff/SKILL.md"
+              ],
+              "names": [
+                "options-payoff"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.9452,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "finance-skills",
+              "name": "options-payoff",
+              "kind": "skill",
+              "path": "plugins/market-analysis/skills/options-payoff/SKILL.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "sepa-strategy",
+              "kind": "skill",
+              "path": "plugins/market-analysis/skills/sepa-strategy/SKILL.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "Calendar Spread (Time Spread) / Iron Condor",
+              "kind": "doc",
+              "path": "plugins/market-analysis/skills/options-payoff/references/strategies.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "Phase 1: Initial Hard Stop (At Entry) / Phase 2: Move to Breakeven (At +8% Profit) / Phase 3: Trailing Stop (At +15% Profit) / Special Case: Rapid Advance / Stop Level Summary",
+              "kind": "doc",
+              "path": "plugins/market-analysis/skills/sepa-strategy/references/position-sizing.md"
+            },
+            {
+              "id": "finance-skills",
+              "name": "stock-correlation",
+              "kind": "skill",
+              "path": "plugins/market-analysis/skills/stock-correlation/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "named_scrape_options",
+          "split": "development",
+          "task": "search",
+          "query": "Firecrawl /scrape onlyMainContent maxAge 0 metadata.cacheState integration",
+          "expected": [
+            {
+              "repo_id": "firecrawl",
+              "path_prefixes": [
+                "skills/firecrawl-build-scrape/SKILL.md"
+              ],
+              "names": [
+                "firecrawl-build-scrape"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.1344,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "firecrawl",
+              "name": "firecrawl-build-scrape",
+              "kind": "skill",
+              "path": "skills/firecrawl-build-scrape/SKILL.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Freshness and Liveness / `maxAge` and the Cache Tradeoff / Verifying What You Got",
+              "kind": "doc",
+              "path": "skills/firecrawl-build-scrape/references/freshness-and-liveness.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "firecrawl-build",
+              "kind": "skill",
+              "path": "skills/firecrawl-build/SKILL.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Extract website data using LLMs / Setup / Getting your Groq and Firecrawl API Keys / Load website with Firecrawl",
+              "kind": "doc",
+              "path": "examples/web_data_extraction/web-data-extraction-using-llms.mdx"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Map / Map with Search / Batch Scrape / SDKs",
+              "kind": "doc",
+              "path": "README.md"
+            }
+          ]
+        },
+        {
+          "id": "portable_soc_queries",
+          "split": "development",
+          "task": "search",
+          "query": "Convert pySigma rules to Splunk and Microsoft Sentinel queries for our SOC",
+          "expected": [
+            {
+              "repo_id": "anthropic-cybersecurity-skills",
+              "path_prefixes": [
+                "skills/building-detection-rules-with-sigma/SKILL.md"
+              ],
+              "names": [
+                "building-detection-rules-with-sigma"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.3283,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "building-detection-rules-with-sigma",
+              "kind": "skill",
+              "path": "skills/building-detection-rules-with-sigma/SKILL.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "API Reference: Building Detection Rules with Sigma / pySigma (sigma-cli) / Key Sigma Rule Fields / Available Backends (pySigma)",
+              "kind": "doc",
+              "path": "skills/building-detection-rules-with-sigma/references/api-reference.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "sigma-cli Commands / References",
+              "kind": "doc",
+              "path": "skills/building-detection-rules-with-sigma/references/api-reference.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "implementing-mitre-attack-coverage-mapping",
+              "kind": "skill",
+              "path": "skills/implementing-mitre-attack-coverage-mapping/SKILL.md"
+            },
+            {
+              "id": "anthropic-cybersecurity-skills",
+              "name": "API Reference: Implementing SIEM Use Cases for Detection / Libraries / attackcti (MITRE ATT&CK) / splunk-sdk (Splunk Integration) / Use Case Lifecycle / Key ATT&CK Techniques for Use Cases / Sigma Rule Format / Detection Quality Metrics",
+              "kind": "doc",
+              "path": "skills/implementing-siem-use-cases-for-detection/references/api-reference.md"
+            }
+          ]
+        },
+        {
+          "id": "mixed_document_qa",
+          "split": "development",
+          "task": "search",
+          "query": "Answer questions across diagrams tables equations and text in the same PDF document",
+          "expected": [
+            {
+              "repo_id": "rag-anything",
+              "path_prefixes": [
+                "README.md"
+              ],
+              "names": []
+            }
+          ],
+          "constraints": "",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.8691,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "rag-anything",
+              "name": "1. End-to-End Document Processing",
+              "kind": "doc",
+              "path": "README.md"
+            },
+            {
+              "id": "docling",
+              "name": "OCR (scanned PDFs and images) / Tables, enrichment, and other content",
+              "kind": "doc",
+              "path": "docling/.agents/skills/docling/references/cli.md"
+            },
+            {
+              "id": "docling",
+              "name": "Standard PDF pipeline",
+              "kind": "doc",
+              "path": "docling/.agents/skills/docling/references/python-sdk.md"
+            },
+            {
+              "id": "docling",
+              "name": "Formula understanding",
+              "kind": "doc",
+              "path": "docs/usage/enrichments.md"
+            },
+            {
+              "id": "financial-services",
+              "name": "pitch-deck",
+              "kind": "skill",
+              "path": "plugins/agent-plugins/pitch-agent/skills/pitch-deck/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "ui_audit_duplicates",
+          "split": "development",
+          "task": "search",
+          "query": "Audit accessibility keyboard focus contrast reduced motion and mobile touch targets in the frontend",
+          "expected": [
+            {
+              "repo_id": "impeccable",
+              "path_prefixes": [
+                ".agents/skills/impeccable/SKILL.md",
+                ".agents/skills/impeccable/reference/audit.md"
+              ],
+              "names": [
+                "impeccable"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 1.8394,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc",
+              "name": "accessibility",
+              "kind": "skill",
+              "path": "skills/accessibility/SKILL.md"
+            },
+            {
+              "id": "ecc",
+              "name": "2. Accessibility",
+              "kind": "doc",
+              "path": "rules/web/testing.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Composition / Accessibility & Responsiveness / 6. Motion & Interaction",
+              "kind": "doc",
+              "path": "design-systems/cisco/DESIGN.md"
+            },
+            {
+              "id": "impeccable",
+              "name": "Diagnostic Scan / 1. Accessibility (VoiceOver / TalkBack)",
+              "kind": "doc",
+              "path": "skill/reference/audit.native.md"
+            },
+            {
+              "id": "chrome-devtools-mcp",
+              "name": "a11y-debugging",
+              "kind": "skill",
+              "path": "skills/a11y-debugging/SKILL.md"
+            }
+          ]
+        },
+        {
+          "id": "adaptive_extraction",
+          "split": "development",
+          "task": "search",
+          "query": "Python HTML extraction that finds the same product elements after a website changes its layout",
+          "expected": [
+            {
+              "repo_id": "scrapling",
+              "path_prefixes": [
+                "agent-skill/Scrapling-Skill/SKILL.md"
+              ],
+              "names": [
+                "scrapling-official"
+              ]
+            }
+          ],
+          "constraints": "",
+          "rank": 3,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.1235,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "scrapling",
+              "name": "Adaptive scraping",
+              "kind": "doc",
+              "path": "docs/parsing/adaptive.md"
+            },
+            {
+              "id": "scrapling",
+              "name": "Adaptive scraping",
+              "kind": "doc",
+              "path": "agent-skill/Scrapling-Skill/references/parsing/adaptive.md"
+            },
+            {
+              "id": "scrapling",
+              "name": "scrapling-official",
+              "kind": "skill",
+              "path": "agent-skill/Scrapling-Skill/SKILL.md"
+            },
+            {
+              "id": "scrapling",
+              "name": "Parsing main classes / Selector",
+              "kind": "doc",
+              "path": "agent-skill/Scrapling-Skill/references/parsing/main_classes.md"
+            },
+            {
+              "id": "firecrawl",
+              "name": "Step 4: Scrape the input URL for product details",
+              "kind": "doc",
+              "path": "examples/blog-articles/amazon-price-tracking/notebook.md"
+            }
+          ]
+        },
+        {
+          "id": "browser_tests",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "End-to-end browser tests for forms navigation and screenshots in a TypeScript web application",
+          "expected": [
+            {
+              "repo_id": "playwright"
+            }
+          ],
+          "constraints": "Headless browser testing in CI",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.7562,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "playwright"
+            },
+            {
+              "id": "chrome-devtools-mcp"
+            },
+            {
+              "id": "opencli"
+            },
+            {
+              "id": "browser-harness"
+            },
+            {
+              "id": "ecc"
+            }
+          ]
+        },
+        {
+          "id": "structural_rewrites",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Find and rewrite Python code by syntax tree patterns rather than plain text matching",
+          "expected": [
+            {
+              "repo_id": "ast-grep"
+            }
+          ],
+          "constraints": "Local CLI; no model API",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 3.3061,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ast-grep"
+            },
+            {
+              "id": "scrapling"
+            },
+            {
+              "id": "open-code-review"
+            },
+            {
+              "id": "codebase-memory-mcp"
+            },
+            {
+              "id": "serena"
+            }
+          ]
+        },
+        {
+          "id": "pdf_ingestion",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Convert local PDF tables and scanned documents into Markdown for a RAG ingestion pipeline",
+          "expected": [
+            {
+              "repo_id": "docling"
+            }
+          ],
+          "constraints": "Local document conversion",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.5524,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "docling"
+            },
+            {
+              "id": "rag-anything"
+            },
+            {
+              "id": "scrapling"
+            },
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "firecrawl"
+            }
+          ]
+        },
+        {
+          "id": "adaptive_parser",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Python HTML extraction that finds product elements after a website changes its layout",
+          "expected": [
+            {
+              "repo_id": "scrapling"
+            }
+          ],
+          "constraints": "Use local HTML parsing when sufficient",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.8293,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "scrapling"
+            },
+            {
+              "id": "firecrawl"
+            },
+            {
+              "id": "hyperframes"
+            },
+            {
+              "id": "browser-harness"
+            },
+            {
+              "id": "cloakbrowser"
+            }
+          ]
+        },
+        {
+          "id": "prompt_regressions",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Evaluate prompt changes and catch regressions across language model outputs",
+          "expected": [
+            {
+              "repo_id": "promptfoo"
+            }
+          ],
+          "constraints": "Report test results for a project",
+          "rank": 1,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.6265,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "promptfoo"
+            },
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "langfuse"
+            },
+            {
+              "id": "serena"
+            },
+            {
+              "id": "humanizer"
+            }
+          ]
+        },
+        {
+          "id": "llm_observability",
+          "split": "holdout",
+          "task": "recommend",
+          "query": "Trace LLM application calls and diagnose token costs and response latency",
+          "expected": [
+            {
+              "repo_id": "langfuse"
+            }
+          ],
+          "constraints": "Inspect self-hosting requirements before deploying",
+          "rank": 2,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 2.4795,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "catalog",
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "ecc"
+            },
+            {
+              "id": "langfuse"
+            },
+            {
+              "id": "shannon"
+            },
+            {
+              "id": "litellm"
+            },
+            {
+              "id": "skillspector"
+            }
+          ]
+        },
+        {
+          "id": "gibberish",
+          "split": "holdout",
+          "task": "search",
+          "query": "qzvplox nnrrtxyz blimzork",
+          "expected": [],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 0.8625,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "open-design",
+              "name": "5. Układ / 6. Głębia / 7. Co robić i czego unikać / Robić: Używać Airtable Blue dla CTA, Haas z dodatnim trackingiem, przyciski z promieniem 12px / Unikać: Pomijać dodatni odstęp między literami, używać ciężkich cieni / 8. Zachowanie responsywne / 9. Przewodnik po promptach dla Agent",
+              "kind": "doc",
+              "path": "design-systems/airtable/DESIGN-pl.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Przyciski / Karty i kontenery",
+              "kind": "doc",
+              "path": "design-systems/shopify/DESIGN-pl.md"
+            },
+            {
+              "id": "open-design",
+              "name": "2. Paleta Kolorów i Role / Główne / Powierzchnie (Ciemny Motyw — domyślny) / Powierzchnie (Jasny Motyw) / Tekst",
+              "kind": "doc",
+              "path": "design-systems/discord/DESIGN-pl.md"
+            },
+            {
+              "id": "open-design",
+              "name": "6. Głębokość i Uniesienie",
+              "kind": "doc",
+              "path": "design-systems/vercel/DESIGN-pl.md"
+            },
+            {
+              "id": "open-design",
+              "name": "Pola Formularzy / Nawigacja / Linki",
+              "kind": "doc",
+              "path": "design-systems/ibm/DESIGN-pl.md"
+            }
+          ]
+        },
+        {
+          "id": "out_of_domain",
+          "split": "holdout",
+          "task": "search",
+          "query": "telepathic marmalade choreography for purple moon hamsters",
+          "expected": [],
+          "constraints": "",
+          "rank": null,
+          "actual_mode": "hybrid",
+          "fallback_reason": null,
+          "seconds": 0.8335,
+          "result_count": 5,
+          "truncated": false,
+          "references_valid": true,
+          "provenance_statuses": [
+            "verified"
+          ],
+          "results": [
+            {
+              "id": "hyperframes",
+              "name": "Variables / Choreography",
+              "kind": "doc",
+              "path": "registry/components/halftone-dissolve/README.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Multi-Cursor Choreography",
+              "kind": "doc",
+              "path": "skills/hyperframes-animation/rules/multi-cursor-choreography.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Transition & Motion",
+              "kind": "doc",
+              "path": "skills/hyperframes-animation/rules-index.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Variables / Choreography",
+              "kind": "doc",
+              "path": "registry/components/ascii-render-pass/README.md"
+            },
+            {
+              "id": "hyperframes",
+              "name": "Choreography",
+              "kind": "doc",
+              "path": "skills/hyperframes-animation/rules/waterfall-entry.md"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "development/search": {
+          "cases": 13,
+          "hits": 8,
+          "hit_at_k": 0.6153846153846154,
+          "mrr_at_k": 0.5641025641025641
+        },
+        "holdout/recommend": {
+          "cases": 6,
+          "hits": 6,
+          "hit_at_k": 1.0,
+          "mrr_at_k": 0.9166666666666666
+        }
+      },
+      "index": {
+        "manifest_sha256": "3cea4cdada184e82c42915e99d398b14a8d65a3bf100bb4023aea67ce1de225c",
+        "schema": "2",
+        "corpus_sha256": "19939d456645281497faeffce205860ae761b6c7ff892a56c6d45e8cb8c6da5b",
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "embedding_fingerprint_sha256": "a440dc1db832e4c8ed07e8acdce72484a4428d6981cfa2279ba948b805c7d3f5"
+      },
+      "latency": {
+        "first_query_seconds": 2.2229,
+        "subsequent_query_median_seconds": 1.8542,
+        "maximum_seconds": 3.3061
+      }
+    }
+  ]
+}

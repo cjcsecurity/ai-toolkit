@@ -1,0 +1,313 @@
+{
+  "version": 1,
+  "label_notes": "Historical development capability labels preserved. Six new repository-selection cases and two unsupported-query observations frozen before running the extension evaluation. Expected lists are partial relevance judgements, not exhaustive ground truth.",
+  "cases": [
+    {
+      "id": "quiet_editorial_ui",
+      "query": "Make this busy dashboard feel like a calm printed journal with generous blank space and muted colors",
+      "expected": [
+        {
+          "repo_id": "taste-skill",
+          "path_prefixes": [
+            "skills/minimalist-skill/SKILL.md"
+          ],
+          "names": [
+            "minimalist-ui"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "stable_client_contract",
+      "query": "Let other teams keep using our service when we add features without forcing everyone to upgrade together",
+      "expected": [
+        {
+          "repo_id": "agent-skills",
+          "path_prefixes": [
+            "skills/api-and-interface-design/SKILL.md"
+          ],
+          "names": [
+            "api-and-interface-design"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "production_visibility",
+      "query": "Next time checkout fails I want to know which service took too long and why the payment was rejected",
+      "expected": [
+        {
+          "repo_id": "agent-skills",
+          "path_prefixes": [
+            "skills/observability-and-instrumentation/SKILL.md"
+          ],
+          "names": [
+            "observability-and-instrumentation"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "resume_session",
+      "query": "I closed yesterday's conversation; help me continue from the unanswered question in this project",
+      "expected": [
+        {
+          "repo_id": "agentmemory",
+          "path_prefixes": [
+            "plugin/skills/handoff/SKILL.md"
+          ],
+          "names": [
+            "handoff"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "past_decisions",
+      "query": "Have we dealt with this problem before and what did we decide in earlier conversations",
+      "expected": [
+        {
+          "repo_id": "agentmemory",
+          "path_prefixes": [
+            "plugin/skills/recall/SKILL.md"
+          ],
+          "names": [
+            "recall"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "spoofed_sender",
+      "query": "Someone sent our accountant a message pretending to be the boss; figure out where it really came from",
+      "expected": [
+        {
+          "repo_id": "anthropic-cybersecurity-skills",
+          "path_prefixes": [
+            "skills/analyzing-email-headers-for-phishing-investigation/SKILL.md"
+          ],
+          "names": [
+            "analyzing-email-headers-for-phishing-investigation"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "lp_statement_check",
+      "query": "Check whether the LP ending capital statement agrees with the NAV pack and flag rounding differences",
+      "expected": [
+        {
+          "repo_id": "financial-services",
+          "path_prefixes": [
+            "plugins/vertical-plugins/fund-admin/skills/nav-tieout/SKILL.md",
+            "plugins/agent-plugins/statement-auditor/skills/nav-tieout/SKILL.md"
+          ],
+          "names": [
+            "nav-tieout"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "options_visual",
+      "query": "Show how my iron condor gains or loses money as the stock price and days remaining change",
+      "expected": [
+        {
+          "repo_id": "finance-skills",
+          "path_prefixes": [
+            "plugins/market-analysis/skills/options-payoff/SKILL.md"
+          ],
+          "names": [
+            "options-payoff"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "named_scrape_options",
+      "query": "Firecrawl /scrape onlyMainContent maxAge 0 metadata.cacheState integration",
+      "expected": [
+        {
+          "repo_id": "firecrawl",
+          "path_prefixes": [
+            "skills/firecrawl-build-scrape/SKILL.md"
+          ],
+          "names": [
+            "firecrawl-build-scrape"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "portable_soc_queries",
+      "query": "Convert pySigma rules to Splunk and Microsoft Sentinel queries for our SOC",
+      "expected": [
+        {
+          "repo_id": "anthropic-cybersecurity-skills",
+          "path_prefixes": [
+            "skills/building-detection-rules-with-sigma/SKILL.md"
+          ],
+          "names": [
+            "building-detection-rules-with-sigma"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "mixed_document_qa",
+      "query": "Answer questions across diagrams tables equations and text in the same PDF document",
+      "expected": [
+        {
+          "repo_id": "rag-anything",
+          "path_prefixes": [
+            "README.md"
+          ],
+          "names": []
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "ui_audit_duplicates",
+      "query": "Audit accessibility keyboard focus contrast reduced motion and mobile touch targets in the frontend",
+      "expected": [
+        {
+          "repo_id": "impeccable",
+          "path_prefixes": [
+            ".agents/skills/impeccable/SKILL.md",
+            ".agents/skills/impeccable/reference/audit.md"
+          ],
+          "names": [
+            "impeccable"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "adaptive_extraction",
+      "query": "Python HTML extraction that finds the same product elements after a website changes its layout",
+      "expected": [
+        {
+          "repo_id": "scrapling",
+          "path_prefixes": [
+            "agent-skill/Scrapling-Skill/SKILL.md"
+          ],
+          "names": [
+            "scrapling-official"
+          ]
+        }
+      ],
+      "split": "development",
+      "task": "search"
+    },
+    {
+      "id": "browser_tests",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "End-to-end browser tests for forms navigation and screenshots in a TypeScript web application",
+      "constraints": "Headless browser testing in CI",
+      "expected": [
+        {
+          "repo_id": "playwright"
+        }
+      ]
+    },
+    {
+      "id": "structural_rewrites",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "Find and rewrite Python code by syntax tree patterns rather than plain text matching",
+      "constraints": "Local CLI; no model API",
+      "expected": [
+        {
+          "repo_id": "ast-grep"
+        }
+      ]
+    },
+    {
+      "id": "pdf_ingestion",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "Convert local PDF tables and scanned documents into Markdown for a RAG ingestion pipeline",
+      "constraints": "Local document conversion",
+      "expected": [
+        {
+          "repo_id": "docling"
+        }
+      ]
+    },
+    {
+      "id": "adaptive_parser",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "Python HTML extraction that finds product elements after a website changes its layout",
+      "constraints": "Use local HTML parsing when sufficient",
+      "expected": [
+        {
+          "repo_id": "scrapling"
+        }
+      ]
+    },
+    {
+      "id": "prompt_regressions",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "Evaluate prompt changes and catch regressions across language model outputs",
+      "constraints": "Report test results for a project",
+      "expected": [
+        {
+          "repo_id": "promptfoo"
+        }
+      ]
+    },
+    {
+      "id": "llm_observability",
+      "split": "holdout",
+      "task": "recommend",
+      "query": "Trace LLM application calls and diagnose token costs and response latency",
+      "constraints": "Inspect self-hosting requirements before deploying",
+      "expected": [
+        {
+          "repo_id": "langfuse"
+        }
+      ]
+    },
+    {
+      "id": "gibberish",
+      "split": "holdout",
+      "task": "search",
+      "query": "qzvplox nnrrtxyz blimzork",
+      "expected": []
+    },
+    {
+      "id": "out_of_domain",
+      "split": "holdout",
+      "task": "search",
+      "query": "telepathic marmalade choreography for purple moon hamsters",
+      "expected": []
+    }
+  ]
+}

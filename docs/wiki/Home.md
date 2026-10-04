@@ -6,6 +6,7 @@ AI Toolkit makes a reviewed catalog of 60 open-source tools searchable without l
 | --- | --- |
 | [Getting started](Getting-Started.md) | Small lexical install, full semantic install, and first searches |
 | [All 60 tools](Tool-Catalog.md) | Categories and a detailed page for every catalog entry |
+| [RAG recommendations](../rag.md) | Project evidence bundles, MCP access, reproducible evaluation and a sourced demo |
 | [Retrieval system](Retrieval-System.md) | Corpus, local embeddings, lexical search, scoring, and limits |
 | [Codex and OpenCode](Codex-and-OpenCode.md) | Explicit client registration and on-demand skills |
 | [Runtime setup](Runtime-Setup.md) | Separate source retrieval from application and MCP setup |
