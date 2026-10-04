@@ -81,7 +81,7 @@ def install(root: Path, home: Path, client: str) -> None:
     if not launcher.is_file() or not (skill / 'SKILL.md').is_file():
         raise ValueError('Checkout must contain bin/toolkit and skills/toolkit-selector/SKILL.md')
     links = {home / '.local/bin/toolkit': launcher, home / '.agents/skills/toolkit-selector': skill}
-    for name in ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp']:
+    for name in ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp', 'toolkit-rag-mcp']:
         helper = root / 'bin' / name
         if helper.is_file():
             links[home / '.local/bin' / name] = helper
