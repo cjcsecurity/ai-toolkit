@@ -99,8 +99,10 @@ class Library:
         self.manifest = self.root / 'manifest.json'
         self.db = self.root / 'index.sqlite3'
 
-    def entries(self):
-        rows = json.loads(self.manifest.read_text())['tools']
+    def entries(self, *, manifest_bytes=None):
+        """Resolve catalog entries, optionally from an already-read snapshot."""
+        raw = self.manifest.read_bytes() if manifest_bytes is None else manifest_bytes
+        rows = json.loads(raw)['tools']
         for row in rows:
             source = Path(row['path'])
             path = (self.root / source).resolve()
@@ -267,6 +269,7 @@ class Library:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=ROOT, help='Toolkit catalog/index directory')
     parser.add_argument('--budget', type=int, default=8000, help='Maximum output characters (default 8000)')
     sub = parser.add_subparsers(dest='cmd', required=True)
     sub.add_parser('list')
@@ -276,6 +279,9 @@ def main():
     group.add_argument('--lexical', action='store_true', help='Build only the lexical index')
     sub.add_parser('search-status')
     sub.add_parser('doctor')
+    p = sub.add_parser('recommend', help='Retrieve cited tool evidence for a project; your agent generates the recommendation')
+    p.add_argument('query'); p.add_argument('--project'); p.add_argument('--constraints', default='')
+    p.add_argument('--limit', type=int, default=5); p.add_argument('--lexical', action='store_true')
     p = sub.add_parser('search'); p.add_argument('query'); p.add_argument('--limit', type=int, default=5); p.add_argument('--repo'); p.add_argument('--kind', choices=['repo', 'skill', 'doc']); p.add_argument('--lexical', action='store_true')
     p = sub.add_parser('show'); p.add_argument('id')
     p = sub.add_parser('docs'); p.add_argument('id'); p.add_argument('query'); p.add_argument('--limit', type=int, default=3); p.add_argument('--lexical', action='store_true')
@@ -284,8 +290,13 @@ def main():
     p = sub.add_parser('select'); p.add_argument('ids', nargs='+'); p.add_argument('--project', default=os.getcwd())
     p = sub.add_parser('project'); p.add_argument('--project', default=os.getcwd())
     args = parser.parse_args()
-    lib = Library()
+    lib = Library(args.root)
     try:
+        if args.cmd == 'recommend':
+            from rag import RagService, encode
+            print(encode(RagService(args.root).recommend(args.query, project=args.project,
+                  constraints=args.constraints, limit=args.limit, lexical_only=args.lexical, budget=args.budget)))
+            return
         if args.cmd == 'list':
             data = [{'id': r['id'], 'kind': r.get('kind'), 'availability': r['availability'], 'source_present': r['source_present']} for r in lib.entries()]
         elif args.cmd == 'index': data = lib.index(semantic=args.semantic, lexical=args.lexical)
