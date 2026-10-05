@@ -17,11 +17,15 @@ def executable(variable, default=None):
     return found
 
 
-entry = os.environ.get('TOOLKIT_CHROME_MCP_ENTRY')
+code = Path(__file__).resolve().parents[1]
+root = Path(os.environ.get('AI_TOOLKIT_HOME', code)).expanduser().resolve()
+runtime = root / 'runtime/chrome-devtools'
+entry = os.environ.get('TOOLKIT_CHROME_MCP_ENTRY') or str(
+    runtime / 'node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js')
 if not entry or not Path(entry).expanduser().is_file():
     raise SystemExit('Set TOOLKIT_CHROME_MCP_ENTRY to an existing Chrome DevTools MCP JavaScript entry point. Install the runtime explicitly; this launcher never downloads packages.')
 node = executable('TOOLKIT_NODE', 'node')
-chrome = executable('TOOLKIT_CHROME_EXECUTABLE')
+chrome = executable('TOOLKIT_CHROME_EXECUTABLE', str(runtime / 'browser/chrome-linux64/chrome'))
 # Prevent callers from replacing the isolated browser or enabling telemetry.
 protected = {'headless', 'isolated', 'executablepath', 'userdatadir',
              'browserurl', 'wsendpoint', 'autoconnect', 'channel',

@@ -38,6 +38,20 @@ class ToolkitTests(unittest.TestCase):
         self.assertEqual(self.lib.search('zyxnonexistent'), [])
         self.assertEqual(self.lib.search('" OR * --')[0:1], [])
 
+    def test_recommend_command_returns_cited_evidence_from_explicit_root(self):
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, str(MODULE), '--root', str(self.root),
+             'recommend', 'browser network', '--lexical'],
+            cwd=self.root, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload['candidates'][0]['id'], 'browser')
+        self.assertEqual(payload['retrieval']['mode'], 'lexical')
+        references = {sid for row in payload['candidates'] for sid in row['evidence']}
+        self.assertEqual(references, {source['source_id'] for source in payload['sources']})
+
     def test_docs_stay_within_selected_repo_and_include_source(self):
         rows = self.lib.docs('browser', 'network')
         self.assertTrue(rows)
@@ -108,6 +122,21 @@ class ToolkitTests(unittest.TestCase):
         self.assertEqual(self.lib.search('watermelons')[0]['id'], 'browser')
         self.assertEqual(self.lib.search('accounting'), [])
 
+    def test_explicit_lexical_search_never_builds_embeddings(self):
+        from unittest.mock import patch
+        for state in ('missing', 'stale'):
+            with self.subTest(state=state):
+                self.lib.index(lexical=True)
+                if state == 'missing':
+                    self.lib.db.unlink()
+                else:
+                    self.rows[0]['description'] = 'Browser diagnostics updated'
+                    self.lib.manifest.write_text(json.dumps({'tools': self.rows}))
+                with patch('hybrid.index_vectors', side_effect=AssertionError('semantic builder invoked')):
+                    rows = self.lib.search('browser', lexical_only=True)
+                self.assertEqual(rows[0]['id'], 'browser')
+                self.assertTrue(all(row['retrieval'] == 'lexical' for row in rows))
+
     def test_selection_preserves_preferences_and_invalid_selection_does_not_write(self):
         project = self.root / 'project'
         project.mkdir()
@@ -121,10 +150,73 @@ class ToolkitTests(unittest.TestCase):
             self.lib.select(['nonexistent'], project)
         self.assertEqual(p.read_text(), before)
 
+    def test_project_commands_reject_symlinks_without_exposing_external_data(self):
+        import os
+        import subprocess
+        import sys
+        project = self.root / 'project'
+        project.mkdir()
+        outside = self.root / 'private.json'
+        outside.write_text(json.dumps({'tools': [], 'private_note': 'dummy-private-marker'}))
+        profile = project / '.ai-toolkit.json'
+        profile.symlink_to(outside)
+        env = dict(os.environ, AI_TOOLKIT_HOME=str(self.root))
+        for command in (['project'], ['select', 'browser']):
+            with self.subTest(command=command):
+                result = subprocess.run(
+                    [sys.executable, str(MODULE), *command, '--project', str(project)],
+                    env=env, capture_output=True, text=True, timeout=5)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertNotIn('dummy-private-marker', result.stdout + result.stderr)
+                self.assertTrue(profile.is_symlink())
+                self.assertEqual(json.loads(outside.read_text())['private_note'], 'dummy-private-marker')
+
     def test_output_is_valid_json_within_budget(self):
         out = self.module.bounded_json([{'text': 'x' * 9000}] * 8, 1200)
         self.assertLessEqual(len(out), 1200)
         self.assertTrue(json.loads(out)['truncated'])
+
+    def test_profile_rejects_broken_links_and_nonregular_files(self):
+        import os
+        profile = self.root / '.ai-toolkit.json'
+        profile.symlink_to(self.root / 'missing')
+        with self.assertRaises(ValueError):
+            self.module.read_project_profile(profile)
+        profile.unlink()
+        profile.mkdir()
+        with self.assertRaises(ValueError):
+            self.module.read_project_profile(profile)
+        profile.rmdir()
+        if hasattr(os, 'mkfifo'):
+            os.mkfifo(profile)
+            with self.assertRaises(ValueError):
+                self.module.read_project_profile(profile)
+
+    def test_profile_rejects_large_and_invalid_documents(self):
+        profile = self.root / '.ai-toolkit.json'
+        for value in ([], {'tools': 'browser'}, {'tools': [None]}, {'notes': 'x' * 70000}):
+            with self.subTest(kind=type(value).__name__):
+                profile.write_text(json.dumps(value))
+                with self.assertRaises(ValueError):
+                    self.module.read_project_profile(profile)
+
+    def test_profile_loader_handles_missing_and_preserves_preferences(self):
+        profile = self.root / '.ai-toolkit.json'
+        self.assertIsNone(self.module.read_project_profile(profile))
+        profile.write_text('{"tools": ["browser"], "notes": "prefer local tools"}')
+        self.assertEqual(self.module.read_project_profile(profile),
+                         {'tools': ['browser'], 'notes': 'prefer local tools'})
+
+    def test_selection_rejects_profile_growth_without_overwriting_preferences(self):
+        project = self.root / 'project'
+        project.mkdir()
+        profile = project / '.ai-toolkit.json'
+        original = json.dumps({'tools': [], 'notes': 'x' * 65500})
+        profile.write_text(original)
+        self.assertIsNotNone(self.module.read_project_profile(profile))
+        with self.assertRaises(ValueError):
+            self.lib.select(['browser', 'finance'], project)
+        self.assertEqual(profile.read_text(), original)
 
     def test_paged_read_returns_exact_continuation_without_losing_characters(self):
         text = 'abcdef' * 500

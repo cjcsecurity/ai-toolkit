@@ -13,7 +13,11 @@ python3 scripts/bootstrap.py --semantic
 bin/toolkit search-status
 ```
 
-This creates an isolated search environment and downloads the pinned model for currently available source and catalog content. To download all source too, add `--all`. `uv` is recommended for Python 3.12; the fallback supports an existing Python 3.11–3.13 with venv. Dependencies are recorded in [`requirements-search.txt`](../../requirements-search.txt).
+This creates an isolated search environment and downloads the pinned model for currently available source and catalog content. To download all source too, add `--all`. `uv` is recommended for Python 3.12; the fallback supports an existing Python 3.12–3.13 with venv. Dependencies are recorded in [`requirements-search.txt`](../../requirements-search.txt).
+
+## Optional RAG server
+
+The local RAG server and CLI recommendations share the manager's search environment. Install `requirements-rag.txt` into `runtime/search` to add the official MCP SDK alongside the pinned embedding dependencies. `bin/toolkit-rag-mcp` starts the stdio server; configure a host explicitly. See [RAG setup](../rag.md).
 
 ## Optional MCP client runtime
 
@@ -63,6 +67,8 @@ Use this example only when the discovered schema exposes `list_pages` with these
 Keep dependent browser operations in one batch when all arguments can be specified upfront. The batch runs sequentially and stops on its first tool error; it does not substitute earlier outputs into later arguments. If subsequent calls need arguments constructed from returned page IDs, use an upstream persistent MCP client that keeps the same session open.
 
 For adapters, `--budget` and `--timeout` go after `tools`, `call`, or `batch`, unlike the main `toolkit --budget ... COMMAND` syntax.
+
+Calls, batches, and individual schemas return JSON. If a response exceeds the budget, the wrapper returns a valid JSON envelope with `truncated: true` and `required_budget`, omitting the response body. The tool's exit status is preserved. Choose a larger budget before calls with side effects; repeating a call to recover its output can repeat the action. The concise tool list and diagnostic errors remain plain text.
 
 ## Other applications
 

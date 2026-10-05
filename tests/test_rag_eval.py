@@ -12,6 +12,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_evaluation_writer_preserves_large_reports(self):
+        from evals import run
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / 'report.json'
+            report = {'runs': [{'requested_mode': 'lexical', 'summary': {}}],
+                      'evidence': 'large report\n' * 8000}
+            with patch.object(run, 'evaluate', return_value=report), \
+                    patch.object(sys, 'argv', ['run.py', '--output', str(output)]):
+                run.main()
+            self.assertEqual(json.loads(output.read_text()), report)
+            self.assertEqual(sorted(p.name for p in Path(folder).iterdir()), ['report.json'])
+
     def test_metrics_count_misses_in_denominator(self):
         result = metrics([1, None, 3])
         self.assertAlmostEqual(result['hit_at_k'], 2/3)

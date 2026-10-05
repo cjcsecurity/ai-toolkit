@@ -4,7 +4,7 @@
 | --- | --- |
 | Repository appears in search but its files cannot be read | Only its catalog summary may be present. Run `python3 scripts/bootstrap.py --repo ID --lexical` to download its pinned source. |
 | Search reports lexical fallback | Run `bin/toolkit search-status`. Explicitly configure semantic retrieval with `python3 scripts/bootstrap.py --semantic`, then check coverage. |
-| Semantic setup cannot find a supported Python | Use `uv` for the recommended Python 3.12 setup, or install Python 3.11–3.13 with venv support. Lexical mode still works on Python 3.11+. |
+| Semantic setup cannot find a supported Python | Use `uv` for the recommended Python 3.12 setup, or install Python 3.12–3.13 with venv support. Lexical mode still works on Python 3.11+. |
 | Model checksum mismatch | Stop using the modified checkpoint. Re-run explicit model setup to download the recorded revision; do not bypass hash verification. |
 | No SQLite FTS5 module | Use a Python distribution whose SQLite includes FTS5. It is required even for lexical mode. |
 | Results are broad or dominated by one collection | Start with `--kind repo`; then refine the task and search within a chosen repository using `--repo ID`. |
