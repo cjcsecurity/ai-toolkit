@@ -7,12 +7,38 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
 
 ROOT = Path(os.environ.get('AI_TOOLKIT_HOME', Path(__file__).resolve().parent)).expanduser().resolve()
 STOP = set('a an the i we you our your to for with and or of in on from use using need want tools tool project that can is are how do me my'.split())
+PROFILE_LIMIT = 64 * 1024
+
+
+def read_project_profile(path):
+    """Read a small regular profile without following a project-supplied link."""
+    try:
+        before = path.lstat()
+    except FileNotFoundError:
+        return None
+    if not stat.S_ISREG(before.st_mode):
+        raise ValueError('Project profile must be a regular file; symlinks are not allowed')
+    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0)
+    with os.fdopen(os.open(path, flags), 'rb') as stream:
+        opened = os.fstat(stream.fileno())
+        if (not stat.S_ISREG(opened.st_mode)
+                or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)):
+            raise ValueError('Project profile changed while opening it')
+        raw = stream.read(PROFILE_LIMIT + 1)
+    if len(raw) > PROFILE_LIMIT:
+        raise ValueError('Project profile exceeds the 64 KiB limit')
+    data = json.loads(raw)
+    if (not isinstance(data, dict) or not isinstance(data.get('tools', []), list)
+            or any(not isinstance(item, str) for item in data.get('tools', []))):
+        raise ValueError('Project profile must be an object with a list of tool names')
+    return data
 
 
 def terms(query):
@@ -24,12 +50,14 @@ def match_query(query):
 
 
 def atomic_json(path, data):
+    payload = (json.dumps(data, indent=2, ensure_ascii=False) + '\n').encode('utf-8')
+    if len(payload) > PROFILE_LIMIT:
+        raise ValueError('Project profile exceeds the 64 KiB limit')
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(dir=path.parent, prefix='.' + path.name)
     try:
-        with os.fdopen(fd, 'w') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-            f.write('\n')
+        with os.fdopen(fd, 'wb') as f:
+            f.write(payload)
         os.replace(name, path)
     finally:
         if os.path.exists(name):
@@ -100,7 +128,10 @@ class Library:
         self.db = self.root / 'index.sqlite3'
 
     def entries(self):
-        rows = json.loads(self.manifest.read_text())['tools']
+        return self._resolve_entries(json.loads(self.manifest.read_text())['tools'])
+
+    def _resolve_entries(self, rows):
+        """Validate one catalog snapshot and derive readiness on this host."""
         for row in rows:
             source = Path(row['path'])
             path = (self.root / source).resolve()
@@ -163,16 +194,16 @@ class Library:
                 os.unlink(temp)
         return {'tools': len(self.entries()), 'passages': len(records), 'index': str(self.db), **status}
 
-    def connect(self):
+    def connect(self, lexical_only=False):
         import hybrid
         if not self.db.exists():
-            self.index()
+            self.index(lexical=lexical_only)
         conn = sqlite3.connect(self.db)
         expected = hashlib.sha256(self.manifest.read_bytes()).hexdigest()
         metadata = dict(conn.execute('SELECT key,value FROM metadata'))
         if metadata.get('manifest_hash') != expected or metadata.get('hybrid_schema') != hybrid.SCHEMA_VERSION:
             conn.close()
-            self.index()
+            self.index(lexical=lexical_only)
             conn = sqlite3.connect(self.db)
         conn.row_factory = sqlite3.Row
         return conn
@@ -181,7 +212,7 @@ class Library:
         import hybrid
         if repo_id:
             repo_id = self.entry(repo_id)['id']
-        with self.connect() as conn:
+        with self.connect(lexical_only=lexical_only) as conn:
             rows, mode = hybrid.retrieve(conn, query, self.root, limit, repo_id, kinds, lexical_only)
         entries = {r['id']: r for r in self.entries()}
         results = []
@@ -244,7 +275,9 @@ class Library:
         if not project.is_dir():
             raise ValueError('Project directory must already exist')
         path = project / '.ai-toolkit.json'
-        data = json.loads(path.read_text()) if path.exists() else {'version': 1, 'tools': []}
+        data = read_project_profile(path)
+        if data is None:
+            data = {'version': 1, 'tools': []}
         data['tools'] = list(dict.fromkeys([*data.get('tools', []), *ids]))
         atomic_json(path, data)
         return {'profile': str(path), 'tools': data['tools'], 'note': 'Records preferences; does not enable services or install dependencies.'}
@@ -267,6 +300,7 @@ class Library:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=ROOT, help='Toolkit catalog/index directory')
     parser.add_argument('--budget', type=int, default=8000, help='Maximum output characters (default 8000)')
     sub = parser.add_subparsers(dest='cmd', required=True)
     sub.add_parser('list')
@@ -276,6 +310,9 @@ def main():
     group.add_argument('--lexical', action='store_true', help='Build only the lexical index')
     sub.add_parser('search-status')
     sub.add_parser('doctor')
+    p = sub.add_parser('recommend', help='Retrieve cited tool evidence for a project; your agent generates the recommendation')
+    p.add_argument('query'); p.add_argument('--project'); p.add_argument('--constraints', default='')
+    p.add_argument('--limit', type=int, default=5); p.add_argument('--lexical', action='store_true')
     p = sub.add_parser('search'); p.add_argument('query'); p.add_argument('--limit', type=int, default=5); p.add_argument('--repo'); p.add_argument('--kind', choices=['repo', 'skill', 'doc']); p.add_argument('--lexical', action='store_true')
     p = sub.add_parser('show'); p.add_argument('id')
     p = sub.add_parser('docs'); p.add_argument('id'); p.add_argument('query'); p.add_argument('--limit', type=int, default=3); p.add_argument('--lexical', action='store_true')
@@ -284,8 +321,13 @@ def main():
     p = sub.add_parser('select'); p.add_argument('ids', nargs='+'); p.add_argument('--project', default=os.getcwd())
     p = sub.add_parser('project'); p.add_argument('--project', default=os.getcwd())
     args = parser.parse_args()
-    lib = Library()
+    lib = Library(args.root)
     try:
+        if args.cmd == 'recommend':
+            from rag import RagService, encode
+            print(encode(RagService(args.root).recommend(args.query, project=args.project,
+                  constraints=args.constraints, limit=args.limit, lexical_only=args.lexical, budget=args.budget)))
+            return
         if args.cmd == 'list':
             data = [{'id': r['id'], 'kind': r.get('kind'), 'availability': r['availability'], 'source_present': r['source_present']} for r in lib.entries()]
         elif args.cmd == 'index': data = lib.index(semantic=args.semantic, lexical=args.lexical)
@@ -304,7 +346,9 @@ def main():
         elif args.cmd == 'select': data = lib.select(args.ids, args.project)
         elif args.cmd == 'project':
             path = Path(args.project).resolve() / '.ai-toolkit.json'
-            data = json.loads(path.read_text()) if path.exists() else {'tools': [], 'note': 'No project selection saved'}
+            data = read_project_profile(path)
+            if data is None:
+                data = {'tools': [], 'note': 'No project selection saved'}
         print(bounded_json(data, args.budget))
     except (OSError, ValueError, RuntimeError, KeyError, sqlite3.Error) as exc:
         print(json.dumps({'error': str(exc)}), file=sys.stderr)

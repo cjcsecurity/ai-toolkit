@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import sqlite3
 import sys
+from collections import Counter
 
 SCHEMA_VERSION = '2'
 # Sharper decay preserves strong single-channel matches among weak shared hits.
@@ -15,6 +16,15 @@ STOP = set('a an the i we you our your to for with and or of in on from use usin
 def query_text(query):
     words = [t for t in re.findall(r'\w+', query.lower()) if t not in STOP and len(t) > 1][:32]
     return ' OR '.join('"' + t + '"' for t in words)
+
+
+def corpus_fingerprint(conn):
+    """Stable identity for source passages, locations and embedding inputs."""
+    result = hashlib.sha256()
+    for row in conn.execute('SELECT uid,repo_id,kind,name,path,start_line,end_line,content_hash FROM units ORDER BY uid'):
+        result.update(json.dumps(tuple(row), ensure_ascii=False, separators=(',', ':')).encode())
+        result.update(b'\n')
+    return result.hexdigest()
 
 
 def populate(conn, records):
@@ -35,6 +45,7 @@ def populate(conn, records):
         conn.execute('INSERT INTO units VALUES (?,?,?,?,?,?,?,?,?,?,?)', (r['uid'], r['repo_id'], r['kind'], r['name'], r['path'], r['start_line'], r['end_line'], r.get('description', ''), r['text'], text, hashlib.sha256(text.encode()).hexdigest()))
         conn.execute('INSERT INTO unit_search VALUES (?,?,?)', (r['uid'], r['name'], r.get('description', '') + '\n' + r['text']))
     conn.execute('INSERT OR REPLACE INTO metadata VALUES (?,?)', ('hybrid_schema', SCHEMA_VERSION))
+    conn.execute('INSERT OR REPLACE INTO metadata VALUES (?,?)', ('corpus_sha256', corpus_fingerprint(conn)))
 
 
 def local_embedder(root):
@@ -93,7 +104,7 @@ def index_vectors(conn, root, required=False, embedder=None):
         cache.close()
 
 
-def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=False, embedder=None):
+def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=False, embedder=None, max_per_repo=None):
     """RRF merges exact-term and meaning matches, then deduplicates capabilities."""
     q = query_text(query)
     if not q:
@@ -106,16 +117,18 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
         where.append('u.kind IN (' + ','.join('?' for _ in kinds) + ')'); params.extend(kinds)
     filters = (' AND ' + ' AND '.join(where)) if where else ''
     top = max(80, limit * 16)
-    identities = {r['uid']: (r['repo_id'], r['path'], r['name']) for r in
-                  conn.execute('SELECT uid,repo_id,path,name FROM units u WHERE 1=1' + filters, params)}
+    identities = {r['uid']: (r['repo_id'], '' if max_per_repo and r['kind'] == 'skill' else r['path'], r['name']) for r in
+                  conn.execute('SELECT uid,repo_id,path,name,kind FROM units u WHERE 1=1' + filters, params)}
     # Rank capabilities, not chunks: a long manual must not consume the candidate pool.
     lex_ranks, snippets, representatives = {}, {}, {}
+    lex_repos, dense_repos = Counter(), Counter()
     cursor = conn.execute("SELECT u.uid,snippet(unit_search,2,'','', ' … ',90) AS excerpt FROM unit_search JOIN units u ON u.uid=unit_search.uid WHERE unit_search MATCH ?" + filters + ' ORDER BY bm25(unit_search,0,4,1)', [q, *params])
     for row in cursor:
         key = identities[row[0]]
-        if key in lex_ranks:
+        if key in lex_ranks or (max_per_repo and lex_repos[key[0]] >= max_per_repo):
             continue
         lex_ranks[key] = len(lex_ranks) + 1
+        lex_repos[key[0]] += 1
         snippets[key] = row[1]
         representatives[key] = row[0]
         if len(lex_ranks) >= top:
@@ -144,9 +157,10 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
                             continue
                         uid = rows[position][0]
                         key = identities[uid]
-                        if key in dense_ranks:
+                        if key in dense_ranks or (max_per_repo and dense_repos[key[0]] >= max_per_repo):
                             continue
                         dense_ranks[key] = len(dense_ranks) + 1
+                        dense_repos[key[0]] += 1
                         similarities[key] = float(scores[position])
                         representatives.setdefault(key, uid)
                         if len(dense_ranks) >= top:
@@ -177,12 +191,13 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
         record.update(score=score, lexical_rank=lr, semantic_rank=sr, semantic_similarity=similarities.get(key), excerpt=excerpt)
         matches.append(record)
     matches.sort(key=lambda r: (-r['score'], r['repo_id'], r['path'], r['start_line']))
-    selected, seen = [], set()
+    selected, seen, selected_repos = [], set(), Counter()
     for row in matches:
         identity = (row['repo_id'], row['path'], row['name'])
-        if identity in seen:
+        if identity in seen or (max_per_repo and selected_repos[row['repo_id']] >= max_per_repo):
             continue
         seen.add(identity)
+        selected_repos[row['repo_id']] += 1
         selected.append(row)
         if len(selected) >= limit:
             break

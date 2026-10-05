@@ -46,7 +46,7 @@ class AgentInstallTests(unittest.TestCase):
 
     def test_available_helper_launchers_are_registered_idempotently(self):
         from scripts.install_agent import install
-        names = ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp']
+        names = ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp', 'toolkit-rag-mcp']
         for name in names:
             (self.root / 'bin' / name).write_text('#!/bin/sh\n')
         install(self.root, self.home, 'both')
@@ -58,7 +58,7 @@ class AgentInstallTests(unittest.TestCase):
 
     def test_helper_conflict_prevents_all_registration_writes(self):
         from scripts.install_agent import install
-        for name in ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp']:
+        for name in ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp', 'toolkit-rag-mcp']:
             with self.subTest(name=name):
                 (self.root / 'bin' / name).write_text('#!/bin/sh\n')
                 home = self.home / name

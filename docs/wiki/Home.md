@@ -1,13 +1,14 @@
 # AI Toolkit wiki
 
-AI Toolkit makes a reviewed catalog of 60 open-source tools searchable without loading every tool's instructions into agent context. Begin with repository comparisons, then retrieve a skill or documentation section inside the selected system.
+AI Toolkit makes a growing personal collection of reviewed open-source tools searchable without loading every tool's instructions into agent context. Begin with repository comparisons, then retrieve a skill or documentation section inside the selected system.
 
 | Start here | What you will find |
 | --- | --- |
 | [Getting started](Getting-Started.md) | Small lexical install, full semantic install, and first searches |
-| [All 60 tools](Tool-Catalog.md) | Categories and a detailed page for every catalog entry |
+| [Tool catalog](Tool-Catalog.md) | Categories and a detailed page for every catalog entry |
 | [Retrieval system](Retrieval-System.md) | Corpus, local embeddings, lexical search, scoring, and limits |
 | [Codex and OpenCode](Codex-and-OpenCode.md) | Explicit client registration and on-demand skills |
+| [Recommendations and MCP](../rag.md) | Cited evidence bundles, source verification, host setup, and evaluation |
 | [Runtime setup](Runtime-Setup.md) | Separate source retrieval from application and MCP setup |
 | [Maintenance](Maintenance.md) | Pins, updates, regeneration, indexing, and checks |
 | [Troubleshooting](Troubleshooting.md) | Missing source, lexical fallback, registration conflicts, and runtime gaps |

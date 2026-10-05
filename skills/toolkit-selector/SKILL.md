@@ -24,6 +24,12 @@ Search uses a pinned local MiniLM model with no query API or background service.
 
 Default output is capped at 8,000 characters. `--budget` precedes the command, e.g. `toolkit --budget 4000 docs scrapling "CSS selectors"`. `read --offset N` continues a long file. Read only relevant files; don't dump the catalog, all skill bodies, or an entire repository into context. Reuse a selection until the task changes or a capability is missing.
 
+## Cited recommendations
+
+Use `toolkit --budget 16000 recommend "project outcome" --project /absolute/project --constraints "explicit requirements"` to combine repository comparison and internal capabilities into a bounded evidence bundle. Use `--lexical` for keyword-only retrieval. Inspect source IDs, provenance, requirements and truncation flags; constraints are context for your assessment, not enforced compatibility filters. Read complete selected setup guides and skills before execution. Generate recommendations from the returned evidence and cite its source locations; retrieval scores are not confidence.
+
+MCP hosts can launch `toolkit-rag-mcp` after the optional RAG runtime is installed. It exposes `search_tools`, `recommend_tools`, `get_tool`, `read_tool_source`, and `search_status` over local stdio, using the same index and manager source. No HTTP service or automatic host registration is involved. See [RAG setup and evidence contract](../../docs/rag.md).
+
 ## Optional engineering runtimes
 
 No third-party application runtime is bundled or automatically provisioned. Use `toolkit show ID` for its upstream prerequisites and setup guide, then check what actually exists on this machine. Recommended shared capabilities include Codebase Memory for graphs, Serena for semantic code navigation, and Chrome DevTools for isolated browser work. Frontend guidance is available in Impeccable; selected Addy Osmani skills cover API design and observability. Preserve the host's existing workflow; Superpowers is an optional separate upstream plugin.
@@ -32,7 +38,7 @@ The optional MCP helpers require their own SDK environment and configured server
 
 - `toolkit-serena tools --project /absolute/project` lists names; add `--tool NAME` to load one schema. Call with `toolkit-serena call NAME --project /absolute/project --args '{...}'`. Use a selected project, not the entire home directory; language-specific tools and caches remain separate.
 - `toolkit-mcp --server chrome tools` discovers browser schemas. Use `batch --steps '[{"tool":"NAME","args":{...}}]'` for multi-step work in one isolated browser session. Each invocation starts fresh; discover current tool schemas and use actual page identifiers instead of assuming sample IDs work across versions. The normal user's browser login is not inherited.
-- For either MCP wrapper, put `--budget` and `--timeout` after `tools`, `call` or `batch`. Clipped MCP output is not complete JSON; narrow the request or raise the budget before relying on a schema.
+- For either MCP wrapper, put `--budget` and `--timeout` after `tools`, `call` or `batch`. Oversized JSON responses return a valid `truncated: true` envelope with `required_budget`; the response body is omitted. Tool discovery lists remain plain text. Inspect truncation before using a response, and avoid repeating calls with side effects just to recover their output.
 
 These helpers do not permanently register native MCP catalogs in either coding client. SDK setup, server installation, browser dependencies, provider credentials and target-project configuration each need their own checks.
 
