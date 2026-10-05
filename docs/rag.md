@@ -21,7 +21,7 @@ bin/toolkit show scrapling
 
 `--budget` and `--root` precede the subcommand. `--limit` caps candidates; budget packing can return fewer. `--lexical` requests keyword-only retrieval. `--project` reads only `.ai-toolkit.json` in the explicit directory, preserving preferences without scanning source code. Constraints accompany the evidence for the agent to assess; they are not automatic compatibility filters.
 
-After optional agent registration, `toolkit` and `toolkit-rag-mcp` are available on PATH. Shell-capable agents can use `bin/toolkit` directly. MCP hosts launch the server with the settings below.
+After [agent registration](wiki/Codex-and-OpenCode.md), shell-capable agents can use `toolkit` and MCP hosts can launch `toolkit-rag-mcp`. Registration does not install optional dependencies or change MCP host settings.
 
 ## Architecture
 
@@ -51,7 +51,7 @@ Recommendations search repository summaries and internal capabilities separately
 
 Responses include `schema_version: 1`, query, actual retrieval mode, index identity, results/candidates, sources, instructions and truncation. Index identity includes a corpus content fingerprint, manifest hash, schema and embedding-model fingerprint. Older indexes calculate and cache the corpus fingerprint until the published file changes; new builds store it in metadata.
 
-Candidates reference `source_id` values in the same response. Sources contain repository identity, path, line span, indexed text, full-passage SHA256, and provenance. Catalog evidence projects the reviewed ID, repository, description and requirements with a JSON pointer; repository summaries do not invent file line numbers. Availability is computed from source presence on the current host and never establishes that an application runtime is installed.
+Candidates reference `source_id` values in the same response. Sources contain repository identity, path, line span, indexed text, full-passage SHA256, and provenance. Catalog evidence is a JSON projection of reviewed manifest fields with a JSON pointer; repository summaries do not invent file line numbers.
 
 | Provenance | Meaning |
 | --- | --- |
@@ -71,55 +71,51 @@ The budget counts compact JSON characters, excluding the newline and MCP protoco
 
 Missing/stale indexes fail with an actionable error; RAG reads never rebuild them implicitly. Missing, incompatible or incomplete embeddings explicitly report `lexical-fallback`, including with empty results. `toolkit index --semantic` publishes a replacement. Existing search commands retain their previous index-maintenance behavior.
 
-## Fresh checkout
+## Set up a checkout
 
-Requires Git and Python 3.11+ for lexical retrieval; semantic retrieval supports Python 3.11–3.13, with 3.12 recommended. Linux, macOS and WSL use the portable launchers. Native Windows is not verified. Sources, model weights and indexes stay outside version control.
-
-Start with selected pinned repositories and local embeddings:
+Start with Git and Python 3.11+ for lexical retrieval:
 
 ```bash
-python3 scripts/bootstrap.py --repo scrapling --repo playwright --repo docling --semantic
-bin/toolkit --budget 16000 recommend "Python HTML extraction that survives layout changes"
+python3 scripts/bootstrap.py --repo brag --repo hyperframes --lexical
+bin/toolkit --budget 16000 recommend "Make a short launch video for my project" --lexical
 ```
 
-Use `--all --semantic` for all 60 source repositories. Bootstrap preserves the relative catalog paths and downloads selected source only; application runtimes remain separate. Setup uses the network, while ordinary queries use the published local index. Rebuilds reuse unchanged embeddings. Selected-source setups have different coverage from the full-catalog evaluation.
-
-For a dependency-free start, use `python3 scripts/bootstrap.py --lexical` and `bin/toolkit recommend "project description" --lexical`. Catalog-only recommendations can cite summaries; internal skill and documentation evidence requires downloaded sources and a rebuilt index.
-
-The optional MCP server needs the SDK as well as the semantic environment:
+For semantic retrieval and the optional MCP server, use Python 3.12–3.13 (3.12 recommended):
 
 ```bash
-uv pip install --python runtime/search/bin/python -r requirements-rag.txt
+python3 scripts/bootstrap.py --repo brag --repo hyperframes --semantic
+uv pip sync --python runtime/search/bin/python requirements-rag.txt
+bin/toolkit search-status
 ```
 
-`uv` is recommended for environment provisioning. If the environment was created with Python's `venv` and includes pip, `runtime/search/bin/python -m pip install -r requirements-rag.txt` also works. The RAG lock includes the search pins plus MCP. Syncing only `requirements-search.txt` removes MCP from that environment.
+The RAG lock includes the search dependencies plus the official MCP SDK. Syncing only `requirements-search.txt` removes MCP from that environment. Downloaded sources, model files and generated indexes remain outside version control. Use `--all` instead of selected `--repo` arguments only when you want the full source library; a cold semantic build can take tens of minutes to hours.
 
-For an alternate catalog, pass `--root /absolute/catalog` to the CLI, server, evaluator and `embeddings.py setup`, or set `AI_TOOLKIT_HOME` for the CLI/server. Source paths must stay inside that catalog root. Indexes, model files and embedding caches belong to that root; a Python environment can be reused across catalogs.
+`AI_TOOLKIT_HOME` or the global `--root /absolute/catalog` argument selects a separate catalog/data root. Its manifest uses source paths within that root. Existing launchers resolve symlinks to the same manager code; no second source checkout is needed.
 
 ## Connect an MCP host
 
-The server runs over local stdio with no HTTP listener. For hosts using the common `mcpServers` configuration shape:
+The server uses local stdio and opens no HTTP listener. After installing `requirements-rag.txt`, configure a host using its supported stdio settings. For hosts with the common `mcpServers` shape:
 
 ```json
 {
   "mcpServers": {
     "ai-toolkit": {
-      "command": "/absolute/ai-toolkit/runtime/search/bin/python",
-      "args": ["/absolute/ai-toolkit/rag_server.py", "--root", "/absolute/ai-toolkit"]
+      "command": "/absolute/ai-toolkit/bin/toolkit-rag-mcp"
     }
   }
 }
 ```
 
-Host formats differ; use the same command/arguments in its stdio-server settings. The five tools are `search_tools`, `recommend_tools`, `get_tool`, `read_tool_source`, and `search_status`. Host configurations are not modified automatically. The existing `toolkit-mcp` command remains the client for other runtimes.
+The five tools are `search_tools`, `recommend_tools`, `get_tool`, `read_tool_source`, and `search_status`. Host configuration is explicit; registration does not activate the server automatically. The existing `toolkit-mcp` command remains a client for other tools' servers.
 
-Test without configuring a host:
+Test an actual SDK session without configuring a host:
 
 ```bash
-runtime/search/bin/python examples/rag_mcp.py --output /tmp/toolkit-evidence.json
+runtime/search/bin/python examples/rag_mcp.py \
+  "Make a short launch video for my project" --output /tmp/toolkit-evidence.json
 ```
 
-This starts a real SDK session and saves evidence. See the [agent demonstration](rag-demo.md) for a separately generated recommendation and its evidence review. Protocol integration follows the [official MCP Python documentation](https://py.sdk.modelcontextprotocol.io/).
+The [agent demonstration](rag-demo.md) preserves a sourced recommendation from an earlier recorded session. The example writes an evidence bundle for the calling agent to assess. It does not generate an answer itself. Protocol integration follows the [official MCP Python documentation](https://py.sdk.modelcontextprotocol.io/).
 
 ## Evaluate
 
@@ -129,31 +125,16 @@ runtime/search/bin/python evals/run.py --output /tmp/rag-evaluation.json
 runtime/search/bin/python evals/run.py --task recommend --output /tmp/recommend-evaluation.json
 ```
 
-The runner preserves 13 historical capability cases and adds six repository-selection cases and two unsupported-query observations. `development`/`holdout` identify when labels were introduced. One parser query overlaps between sets; these are not independent unseen-query generalization results.
+The frozen dataset contains historical capability cases, repository-selection cases, and unsupported-query observations. Reports record dataset, implementation, index and model identities, output budget, actual retrieval mode, ranks and latency. Keep new generated reports local until reviewed: they can contain checkout paths and selected-project context. The repository includes a previously sanitized [historical evaluation](../reviews/rag-evaluation.json) and [MCP evidence bundle](../reviews/rag-demo-evidence.json), recorded before the current runtime update. Their embedded hashes identify the measured implementation and index; they are not results for this release.
 
-The [evaluation report](../reviews/rag-evaluation.json) records dataset/implementation/index/model identities, its 64,000-character budget, actual fallback modes, ranks and latency. The larger evaluation budget isolates retrieval from the 8,000-character interactive budget. Hit@5 measures a designated source's presence; MRR@5 measures its first rank. Partial relevance labels do not support a recall claim. Timing includes source verification and packing; first-query timing includes lazy model initialization, and process startup is excluded.
-
-Every miss and unsupported-query result remains in the report. Retrieval does not validate a generated answer. The caller must assess relevance, compare constraints, and cite support. Generated-answer faithfulness and installation success need separate evaluation.
+Hit@5 measures whether a designated source appears; MRR@5 measures its first rank. Partial labels do not support recall claims, and the development/holdout labels are not a claim of independent unseen-query generalization. Retrieval evaluation does not establish generated-answer faithfulness or successful installation. Measure those separately before making broader quality claims.
 
 ## Limits
 
-- Some broad requests and paraphrases still miss designated capabilities.
-- Nonsense queries can return irrelevant results; there is no calibrated abstention detector.
-- Constraints are agent context, not automatic compatibility rules.
-- Dense retrieval scans stored vectors per query; larger or hosted workloads need capacity measurements.
-- No reranker, remote hosting, code-symbol extraction or automatic source updates are included.
-- Source presence is reported per host; application runtime readiness still requires explicit verification.
-- One reviewed agent example demonstrates that example, not broad answer faithfulness.
+- Broad requests and paraphrases can miss useful capabilities; unsupported queries can return irrelevant results.
+- Constraints are context for the calling agent, not automatic compatibility rules.
+- Dense retrieval scans stored vectors per query; larger workloads need capacity measurements.
+- No reranker, hosted service, calibrated confidence score, or automatic source update is included.
+- Source presence and verified attribution do not prove runtime readiness or safe execution.
 
-## Recorded retrieval results
-
-Measured on the full 60-repository, 149,904-passage catalog on 2026-10-04 UTC, using the report settings and limitations above.
-
-| Mode | Label set/task | Hit@5 | MRR@5 |
-| --- | --- | --- | --- |
-| lexical | development/search | 8/13 | 0.5192 |
-| lexical | holdout/recommend | 6/6 | 0.8333 |
-| hybrid | development/search | 8/13 | 0.5641 |
-| hybrid | holdout/recommend | 6/6 | 0.9167 |
-
-The hybrid repository recommendations ranked five of six designated targets first. Both modes still missed five of thirteen historical capability targets. Unsupported queries can return results in either mode; all observations remain in the JSON report.
+[Back to the README](../README.md) · [Retrieval details](wiki/Retrieval-System.md)
