@@ -2,9 +2,7 @@
 
 ![AI Toolkit: a growing library, a useful way through. Curated tools with local retrieval and source evidence.](docs/assets/readme-hero.png)
 
-[![CI](https://github.com/cjcsecurity/ai-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/cjcsecurity/ai-toolkit/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](docs/wiki/Getting-Started.md)
-[![Curated library](https://img.shields.io/badge/library-personally_curated-1E5CC6)](docs/wiki/Tool-Catalog.md)
 [![License: MIT](https://img.shields.io/badge/manager-MIT-163C35)](LICENSE)
 
 **A growing personal library of tools worth exploring, with the context to put them to work.**
