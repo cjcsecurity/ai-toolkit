@@ -5,15 +5,15 @@
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](docs/wiki/Getting-Started.md)
 [![License: MIT](https://img.shields.io/badge/manager-MIT-163C35)](LICENSE)
 
-**A growing personal library of tools worth exploring, with the context to put them to work.**
+**A growing personal tool library with a local RAG backend for coding agents.**
 
 I keep AI Toolkit as a curated collection of open-source tools and agent skills I've reviewed. Some are part of my working setup; others are tools I want to explore. The catalog records their purpose, requirements, setup guidance, and source revision, so a useful find does not disappear into a bookmark folder.
 
 The Python CLI searches repository summaries, individual skills, and documentation from local source copies. Compare candidates, check what they need to run, and retrieve the instructions that fit the task. The collection grows as I find and review useful tools; inclusion does not mean every tool is installed or used daily.
 
-Search runs locally: start with Python's standard library and SQLite, then add semantic retrieval when you need matches by meaning. Neither mode needs a model API key. The CLI and optional MCP server can also assemble cited evidence for your agent to turn into a recommendation. Integrations are available for Codex and OpenCode.
+Search runs locally: start with Python's standard library and SQLite, then add semantic retrieval when you need matches by meaning. Neither retrieval mode needs a model API key. The CLI and optional MCP server support **retrieval-augmented generation (RAG)** by assembling cited source evidence for your connected agent to use when generating a recommendation. Integrations are available for Codex and OpenCode.
 
-[Quick start](#quick-start) · [See it in action](#see-it-in-action) · [Engineering](#engineering) · [Browse the library](#tool-catalog) · [Wiki](docs/wiki/Home.md) · [Contributing](CONTRIBUTING.md)
+[Quick start](#quick-start) · [See it in action](#see-it-in-action) · [Local RAG](#local-rag-for-coding-agents) · [Engineering](#engineering) · [Browse the library](#tool-catalog) · [Wiki](docs/wiki/Home.md) · [Contributing](CONTRIBUTING.md)
 
 ## See it in action
 
@@ -98,7 +98,7 @@ bin/toolkit select playwright --project /path/to/project
 
 `select` records a project's preferences in `.ai-toolkit.json`; it does not install dependencies or start services. Rankings help with discovery. Inspect the requirements and source evidence before choosing a tool.
 
-## Recommendations with evidence
+## Local RAG for coding agents
 
 ```bash
 bin/toolkit --budget 16000 recommend \
