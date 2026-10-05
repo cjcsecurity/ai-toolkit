@@ -132,7 +132,7 @@ class RagService:
     @contextmanager
     def _snapshot(self, lexical_only):
         raw = self.library.manifest.read_bytes()
-        entries = self.library._resolve_entries(json.loads(raw)['tools'])
+        entries = self.library.entries(manifest_bytes=raw)
         if not self.library.db.is_file():
             raise RuntimeError('Published index missing; run toolkit index --semantic')
         before = self.library.db.stat()

@@ -115,7 +115,7 @@ runtime/search/bin/python examples/rag_mcp.py \
   "Make a short launch video for my project" --output /tmp/toolkit-evidence.json
 ```
 
-The example writes an evidence bundle for the calling agent to assess. It does not generate an answer itself. Protocol integration follows the [official MCP Python documentation](https://py.sdk.modelcontextprotocol.io/).
+The [agent demonstration](rag-demo.md) preserves a sourced recommendation from an earlier recorded session. The example writes an evidence bundle for the calling agent to assess. It does not generate an answer itself. Protocol integration follows the [official MCP Python documentation](https://py.sdk.modelcontextprotocol.io/).
 
 ## Evaluate
 
@@ -125,7 +125,7 @@ runtime/search/bin/python evals/run.py --output /tmp/rag-evaluation.json
 runtime/search/bin/python evals/run.py --task recommend --output /tmp/recommend-evaluation.json
 ```
 
-The frozen dataset contains historical capability cases, repository-selection cases, and unsupported-query observations. Reports record dataset, implementation, index and model identities, output budget, actual retrieval mode, ranks and latency. Keep generated reports local: they can contain checkout paths and selected-project context.
+The frozen dataset contains historical capability cases, repository-selection cases, and unsupported-query observations. Reports record dataset, implementation, index and model identities, output budget, actual retrieval mode, ranks and latency. Keep new generated reports local until reviewed: they can contain checkout paths and selected-project context. The repository includes a previously sanitized [historical evaluation](../reviews/rag-evaluation.json) and [MCP evidence bundle](../reviews/rag-demo-evidence.json), recorded before the current runtime update. Their embedded hashes identify the measured implementation and index; they are not results for this release.
 
 Hit@5 measures whether a designated source appears; MRR@5 measures its first rank. Partial labels do not support recall claims, and the development/holdout labels are not a claim of independent unseen-query generalization. Retrieval evaluation does not establish generated-answer faithfulness or successful installation. Measure those separately before making broader quality claims.
 

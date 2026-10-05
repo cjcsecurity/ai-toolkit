@@ -28,7 +28,7 @@ Default output is capped at 8,000 characters. `--budget` precedes the command, e
 
 Use `toolkit --budget 16000 recommend "project outcome" --project /absolute/project --constraints "explicit requirements"` to combine repository comparison and internal capabilities into a bounded evidence bundle. Use `--lexical` for keyword-only retrieval. Inspect source IDs, provenance, requirements and truncation flags; constraints are context for your assessment, not enforced compatibility filters. Read complete selected setup guides and skills before execution. Generate recommendations from the returned evidence and cite its source locations; retrieval scores are not confidence.
 
-MCP hosts can launch `toolkit-rag-mcp` after the optional RAG runtime is installed. It exposes `search_tools`, `recommend_tools`, `get_tool`, `read_tool_source`, and `search_status` over local stdio, using the same index and manager source. No HTTP service or automatic host registration is involved. See [RAG setup and evidence contract](../../docs/rag.md).
+MCP hosts can launch `toolkit-rag-mcp` after the optional RAG runtime is installed. It exposes `search_tools`, `recommend_tools`, `get_tool`, `read_tool_source`, and `search_status` over local stdio, using the same index and manager source. Source and catalog reads are paginated; continue until `next_offset` is null. RAG reads require an explicitly built index and never rebuild or install tools automatically. No HTTP service or automatic host registration is involved. See [RAG setup and evidence contract](../../docs/rag.md).
 
 ## Optional engineering runtimes
 

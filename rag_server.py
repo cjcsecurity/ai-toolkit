@@ -6,9 +6,12 @@ import argparse
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from mcp.server import MCPServer
-from mcp.types import ToolAnnotations
-from pydantic import Field
+try:
+    from mcp.server import MCPServer
+    from mcp.types import ToolAnnotations
+    from pydantic import Field
+except ImportError as error:
+    raise SystemExit('RAG MCP dependencies are missing or incompatible; install requirements-rag.txt in your Python environment.') from error
 
 from rag import INSTRUCTIONS, RagService
 from toolkit import ROOT

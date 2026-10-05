@@ -11,6 +11,14 @@ from rag_fixture import make_library
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class RagDependencyTests(unittest.TestCase):
+    def test_missing_sdk_explains_optional_installation(self):
+        result = subprocess.run([sys.executable, '-S', str(ROOT/'rag_server.py')],
+                                capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('requirements-rag.txt', result.stderr)
+
+
 @unittest.skipUnless(importlib.util.find_spec('mcp'), 'Install requirements-rag.txt for MCP integration tests')
 class RagServerTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_stdio_session_recommendation_cli_parity_and_errors(self):
@@ -21,7 +29,7 @@ class RagServerTests(unittest.IsolatedAsyncioTestCase):
             root = Path(folder)
             library = make_library(root)
             params = StdioServerParameters(command=sys.executable,
-                args=[str(ROOT / 'rag_server.py'), '--root', str(root)])
+                args=[str(ROOT / 'bin/toolkit-rag-mcp'), '--root', str(root)])
             async with AsyncExitStack() as stack:
                 stderr = stack.enter_context(tempfile.TemporaryFile(mode='w+'))
                 streams = await stack.enter_async_context(stdio_client(params, errlog=stderr))

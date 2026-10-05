@@ -34,7 +34,7 @@ def make_library(root):
         git(repo, 'add', '.')
         git(repo, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
             'commit', '-qm', 'Fixture sources')
-        rows.append(dict(id=name, repo=f'demo/{name}', path=str(repo),
+        rows.append(dict(id=name, repo=f'demo/{name}', path=str(repo.relative_to(root)),
                          url=f'https://github.com/demo/{name}', commit=git(repo, 'rev-parse', 'HEAD'),
                          description=description, tags=[], skill_paths=['skills/main/SKILL.md'],
                          availability='source-ready', requirements=['Python 3.12'],

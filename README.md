@@ -109,7 +109,7 @@ bin/toolkit --budget 16000 recommend \
 
 `recommend` compares repository and capability matches, then returns a bounded evidence bundle with source IDs, paths, revision checks, and setup context. Your agent generates the recommendation from that evidence. Add `--project /path/to/project` to include saved tool preferences; explicit constraints remain context for the agent to assess.
 
-The optional stdio MCP server exposes the same retrieval and evidence service to other hosts. [Set up RAG and MCP](docs/rag.md) for semantic recommendations, the source contract, and evaluation limits.
+The optional stdio MCP server exposes the same retrieval and evidence service to other hosts. [Set up RAG and MCP](docs/rag.md) for semantic recommendations, the source contract, and evaluation limits, or read the [recorded agent demonstration](docs/rag-demo.md).
 
 ## Engineering
 

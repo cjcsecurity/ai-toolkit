@@ -1,4 +1,3 @@
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -137,7 +136,8 @@ class RagTests(unittest.TestCase):
     def test_relative_catalog_paths_have_verified_provenance_from_another_directory(self):
         manifest = json.loads(self.library.manifest.read_text())
         for entry in manifest['tools']:
-            entry['path'] = str(Path(entry['path']).relative_to(self.root))
+            source = Path(entry['path'])
+            entry['path'] = str(source.relative_to(self.root) if source.is_absolute() else source)
         self.library.manifest.write_text(json.dumps(manifest))
         self.library.index(lexical=True)
         result = self.service.search('checkpoints', repo_id='recovery', kind='skill', lexical_only=True)
@@ -230,18 +230,17 @@ class RagTests(unittest.TestCase):
         self.assertTrue(after['results'])
         self.assertNotEqual(before['index'], after['index'])
 
-    @unittest.skipUnless(importlib.util.find_spec('numpy'), 'Install requirements-search.txt for vector tests')
     def test_partial_vector_index_reports_fallback(self):
         import sqlite3
-        import numpy as np
+        from array import array
         class Model:
             fingerprint = 'test'
             def embed_query(self, query):
-                return np.array([1, 0], dtype=np.float32)
+                raise AssertionError('Incomplete indexes must fall back before query embedding')
         with sqlite3.connect(self.library.db) as db:
             db.execute("INSERT INTO metadata VALUES ('embedding_fingerprint','test')")
             uid = db.execute('SELECT uid FROM units LIMIT 1').fetchone()[0]
-            db.execute('INSERT INTO unit_vectors VALUES (?,?)', (uid, np.array([1, 0], dtype=np.float32).tobytes()))
+            db.execute('INSERT INTO unit_vectors VALUES (?,?)', (uid, array('f', [1, 0]).tobytes()))
         with patch('hybrid.local_embedder', return_value=Model()):
             result = self.service.search('checkpoints')
         self.assertEqual(result['retrieval']['mode'], 'lexical-fallback')
@@ -297,6 +296,36 @@ class RagTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(json.loads(proc.stdout), self.service.recommend('checkpoints', lexical_only=True))
 
+
+class RagPortabilityTests(unittest.TestCase):
+    def test_quoted_home_directory_root_matches_library_resolution(self):
+        self.assertEqual(RagService('~').library.root, Path.home().resolve())
+
+    def test_relative_sources_work_from_an_unrelated_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'toolkit with spaces'
+            root.mkdir()
+            make_library(root)
+            service = RagService(root)
+            result = service.search('Persist checkpoints', repo_id='platform', kind='skill', lexical_only=True, budget=16000)
+            self.assertTrue(result['sources'])
+            self.assertTrue(all(s['provenance']['status'] == 'verified' for s in result['sources']))
+            self.assertTrue(all(r['availability'] == 'source-only' for r in result['results']))
+            catalog = service.search('checkpoints', kind='repo', lexical_only=True, budget=16000)
+            for source in catalog['sources']:
+                evidence = json.loads(source['text'])
+                raw = json.loads((root/'manifest.json').read_text())['tools']
+                entry = next(e for e in raw if e['id'] == source['repo_id'])
+                self.assertTrue(all(entry[k] == v for k, v in evidence.items()))
+
+    def test_missing_downloads_report_current_host_availability(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            make_library(root)
+            shutil.rmtree(root/'repos/platform')
+            result = RagService(root).search('General development collection', repo_id='platform', kind='repo', lexical_only=True)
+            self.assertEqual(result['results'][0]['availability'], 'source-missing')
 
 if __name__ == '__main__':
     unittest.main()

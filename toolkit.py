@@ -127,11 +127,10 @@ class Library:
         self.manifest = self.root / 'manifest.json'
         self.db = self.root / 'index.sqlite3'
 
-    def entries(self):
-        return self._resolve_entries(json.loads(self.manifest.read_text())['tools'])
-
-    def _resolve_entries(self, rows):
-        """Validate one catalog snapshot and derive readiness on this host."""
+    def entries(self, *, manifest_bytes=None):
+        """Resolve catalog entries, optionally from an already-read snapshot."""
+        raw = self.manifest.read_bytes() if manifest_bytes is None else manifest_bytes
+        rows = json.loads(raw)['tools']
         for row in rows:
             source = Path(row['path'])
             path = (self.root / source).resolve()

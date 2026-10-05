@@ -31,6 +31,7 @@ class Sources:
         return (result.stdout.strip() if strip else result.stdout) if result.returncode == 0 else None
 
     def catalog(self, entry):
+        # Availability is resolved for this host, not evidence from the manifest.
         fields = ('id', 'repo', 'description', 'requirements')
         text = json.dumps({k: entry[k] for k in fields if k in entry}, ensure_ascii=False)
         return dict(source_id='catalog-' + digest(entry['id'] + text)[:16], repo_id=entry['id'],
