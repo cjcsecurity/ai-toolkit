@@ -145,6 +145,22 @@ class MCPClientTests(unittest.TestCase):
         self.assertEqual(code,0,err)
         self.assertLessEqual(len(out),200)
         self.assertIn('truncated',out.lower())
+        body=json.loads(out)
+        self.assertTrue(body['truncated'])
+        self.assertGreater(body['required_budget'],200)
+
+    def test_truncated_schema_and_batch_remain_valid_json(self):
+        for args in [
+            ('tools','--tool','echo'),
+            ('batch','--steps',json.dumps([{'tool':'echo','args':{'text':'x'*1000}}])),
+        ]:
+            with self.subTest(args=args[0]):
+                code,out,err=self.run_cli(*args,'--project',str(self.project),'--budget','128')
+                self.assertEqual(code,0,err)
+                self.assertLessEqual(len(out),128)
+                body=json.loads(out)
+                self.assertTrue(body['truncated'])
+                self.assertGreater(body['required_budget'],128)
 
     def test_timeout_is_bounded_and_reaps_server(self):
         start=time.monotonic()

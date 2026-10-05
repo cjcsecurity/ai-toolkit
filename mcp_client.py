@@ -63,10 +63,14 @@ def parser():
     return cli
 
 
-def emit(text, budget, stream):
+def emit(text, budget, stream, *, json_output=False):
     text = text.rstrip('\n') + '\n'
     if len(text) > budget:
-        text = text[:budget-len(TRUNCATION)] + TRUNCATION
+        if json_output:
+            text = json.dumps({'truncated': True, 'required_budget': len(text),
+                               'message': 'Response omitted; increase --budget.'}) + '\n'
+        else:
+            text = text[:budget-len(TRUNCATION)] + TRUNCATION
     stream.write(text)
 
 
@@ -163,7 +167,8 @@ def main(argv=None):
             variable = 'TOOLKIT_SERENA_COMMAND' if options.server == 'serena' else 'TOOLKIT_CHROME_COMMAND'
             raise ValueError(f'{options.server} executable unavailable: {command}. Install it explicitly and set {variable} to its executable path.')
         output, code = anyio.run(execute, options, project, arguments)
-        emit(output, options.budget, sys.stdout)
+        emit(output, options.budget, sys.stdout,
+             json_output=options.command != 'tools' or bool(options.tool))
         return code
     except SystemExit as error:
         return int(error.code or 0)
