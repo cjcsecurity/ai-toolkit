@@ -7,20 +7,35 @@ from collections import defaultdict
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import statistics
 import sys
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from rag import RagService
-from toolkit import atomic_json
 
 
 def file_hash(path):
     with Path(path).open('rb') as stream:
         return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def write_report(path, report):
+    """Replace a complete evaluation report without applying project-profile limits."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(dir=path.parent, prefix='.' + path.name)
+    try:
+        with os.fdopen(descriptor, 'w', encoding='utf-8') as stream:
+            json.dump(report, stream, ensure_ascii=False, indent=2)
+            stream.write('\n')
+        os.replace(name, path)
+    finally:
+        Path(name).unlink(missing_ok=True)
 
 
 def metrics(ranks):
@@ -115,7 +130,7 @@ def main():
     parser.add_argument('--task', choices=['all', 'search', 'recommend'], default='all')
     args = parser.parse_args()
     report = evaluate(args.root, args.cases, limit=args.limit, split=args.split, task=args.task)
-    atomic_json(args.output, report)
+    write_report(args.output, report)
     print(json.dumps({r['requested_mode']: r['summary'] for r in report['runs']}, indent=2))
 
 

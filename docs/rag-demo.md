@@ -1,6 +1,6 @@
 # Agent recommendation demonstration
 
-This example was run on 2026-10-04 UTC using the real local stdio MCP server and its official Python SDK client. Evidence came from the published 60-repository index and local MiniLM model. The calling Codex assistant generated the recommendation below after inspecting that evidence. The session did not expose an exact deployment/model identifier; no separate generation API was called.
+This example was run on 2026-10-04 UTC using the real local stdio MCP server and its official Python SDK client. Evidence came from the then-current repository index and local MiniLM model. This is a historical example recorded before the current embedding-runtime update; the linked evidence identifies that earlier index. The calling Codex assistant generated the recommendation below after inspecting that evidence. The session did not expose an exact deployment/model identifier; no separate generation API was called.
 
 ## Request and retrieval
 
@@ -9,7 +9,9 @@ This example was run on 2026-10-04 UTC using the real local stdio MCP server and
 Constraint: prefer local Python parsing and inspect setup requirements.
 
 ```bash
-runtime/search/bin/python examples/rag_mcp.py --output /tmp/rag-demo-evidence.json
+runtime/search/bin/python examples/rag_mcp.py \
+  --constraints "Prefer local Python parsing; inspect setup requirements." \
+  --output /tmp/rag-demo-evidence.json
 ```
 
 The recorded [MCP evidence bundle](../reviews/rag-demo-evidence.json) contains three candidates: Scrapling, Firecrawl and Browser Harness. It records the query, constraint, model/corpus identity, repository prerequisites, exact evidence, and source provenance. Retrieval used hybrid mode. This script performs retrieval only; the prose below is the separately generated answer.

@@ -23,8 +23,11 @@ class Sources:
         self.files = {}
 
     def _git(self, entry, *args, strip=True):
-        result = subprocess.run(['git', '-C', entry['path'], *args],
-                                capture_output=True, text=True, timeout=10)
+        try:
+            result = subprocess.run(['git', '-C', entry['path'], *args],
+                                    capture_output=True, text=True, timeout=10)
+        except (OSError, subprocess.TimeoutExpired):
+            return None
         return (result.stdout.strip() if strip else result.stdout) if result.returncode == 0 else None
 
     def catalog(self, entry):
@@ -57,7 +60,8 @@ class Sources:
                 # Git status can hide edits behind assume-unchanged/skip-worktree.
                 # Verify the actual bytes represented by the immutable link instead.
                 committed = self._git(entry, 'show', f"{recorded}:{row['path']}", strip=False)
-                status = 'verified' if committed == self.files[key] else 'modified'
+                status = ('unversioned' if committed is None else
+                          'verified' if committed == self.files[key] else 'modified')
         except (OSError, ValueError):
             status = 'source-unavailable'
         url = None

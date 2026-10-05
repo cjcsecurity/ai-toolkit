@@ -1,6 +1,6 @@
 - [Home](Home.md)
 - [Getting started](Getting-Started.md)
-- [All 60 tools](Tool-Catalog.md)
+- [Tool catalog](Tool-Catalog.md)
 - [RAG recommendations](../rag.md)
 - [Agent demonstration](../rag-demo.md)
 - [Retrieval system](Retrieval-System.md)

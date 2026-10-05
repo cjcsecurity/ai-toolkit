@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -28,6 +29,29 @@ class RagTests(unittest.TestCase):
         platform = next(c for c in result['candidates'] if c['id'] == 'platform')
         capabilities = [s for s in result['sources'] if s['source_id'] in platform['evidence'] and s['kind'] == 'skill']
         self.assertEqual(len([s for s in capabilities if s['name'] == 'durable-execution']), 1)
+
+    def test_service_expands_tilde_root_before_resolving(self):
+        root = '~/' + os.path.relpath(self.root, Path.home())
+        service = RagService(root)
+        self.assertEqual(service.library.root, self.root)
+        result = service.search('checkpoints', repo_id='recovery', lexical_only=True)
+        self.assertTrue(result['results'])
+
+    def test_git_verification_failures_preserve_unverified_evidence(self):
+        original_run = subprocess.run
+        for command in ('rev-parse', 'show'):
+            for error in (FileNotFoundError('git unavailable'), subprocess.TimeoutExpired('git', 10)):
+                def fail_verification(args, **kwargs):
+                    if command in args:
+                        raise error
+                    return original_run(args, **kwargs)
+                with self.subTest(command=command, error=type(error).__name__), \
+                        patch('rag_sources.subprocess.run', side_effect=fail_verification):
+                    result = self.service.search('checkpoints', repo_id='recovery', kind='skill', lexical_only=True)
+                    source = result['sources'][0]
+                    self.assertIn('checkpoints', source['text'])
+                    self.assertEqual(source['provenance']['status'], 'unversioned')
+                    self.assertIsNone(source['url'])
 
     def test_evidence_is_exact_source_text_with_verified_commit_link(self):
         result = self.service.search('checkpoints', repo_id='platform', kind='skill', lexical_only=True)
@@ -97,6 +121,41 @@ class RagTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'profile'):
             self.service.recommend('checkpoints', project=str(project))
 
+    def test_project_context_rejects_symlinks_without_reading_external_preferences(self):
+        project = self.root / 'project'
+        project.mkdir()
+        outside = self.root / 'outside-profile.json'
+        outside.write_text('{"tools": ["private-tool"]}')
+        profile = project / '.ai-toolkit.json'
+        profile.symlink_to(outside)
+        for target_exists in (True, False):
+            with self.subTest(target_exists=target_exists), self.assertRaises(ValueError):
+                self.service.recommend('checkpoints', project=str(project), lexical_only=True)
+            outside.unlink(missing_ok=True)
+
+    def test_relative_catalog_paths_have_verified_provenance_from_another_directory(self):
+        manifest = json.loads(self.library.manifest.read_text())
+        for entry in manifest['tools']:
+            source = Path(entry['path'])
+            entry['path'] = str(source.relative_to(self.root) if source.is_absolute() else source)
+        self.library.manifest.write_text(json.dumps(manifest))
+        self.library.index(lexical=True)
+        result = self.service.search('checkpoints', repo_id='recovery', kind='skill', lexical_only=True)
+        self.assertEqual(result['sources'][0]['provenance']['status'], 'verified')
+        self.assertTrue(result['sources'][0]['url'])
+
+    def test_recommendation_reports_local_source_availability(self):
+        result = self.service.recommend('checkpoints', lexical_only=True)
+        self.assertTrue(result['candidates'])
+        self.assertTrue(all(row['availability'] == 'source-only' for row in result['candidates']))
+
+    def test_recommendation_rejects_catalog_paths_outside_root(self):
+        manifest = json.loads(self.library.manifest.read_text())
+        manifest['tools'][0]['path'] = '../outside'
+        self.library.manifest.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, 'inside the toolkit root'):
+            self.service.recommend('checkpoints', lexical_only=True)
+
     def test_budget_preserves_complete_references(self):
         result = self.service.recommend('checkpoints', lexical_only=True, budget=2500)
         self.assertLessEqual(len(encode(result)), 2500)
@@ -124,6 +183,17 @@ class RagTests(unittest.TestCase):
         self.assertTrue(sources)
         self.assertTrue(all(s['path'] == 'manifest.json' and s['json_pointer'].startswith('/tools/') for s in sources))
         self.assertTrue(all(s['lines'] is None for s in sources))
+
+    def test_catalog_citation_contains_reviewed_fields_without_derived_availability(self):
+        result = self.service.recommend('checkpoints', lexical_only=True, budget=64000)
+        source = next(s for s in result['sources'] if s['kind'] == 'repo' and s['repo_id'] == 'recovery')
+        self.assertEqual(json.loads(source['text']), {
+            'id': 'recovery', 'repo': 'demo/recovery',
+            'description': 'Checkpoints and recovery for interrupted jobs',
+            'requirements': ['Python 3.12'],
+        })
+        candidate = next(row for row in result['candidates'] if row['id'] == 'recovery')
+        self.assertEqual(candidate['availability'], 'source-only')
 
     def test_empty_results_still_report_fallback(self):
         result = self.service.search('unfindablezxq')
@@ -225,7 +295,6 @@ class RagTests(unittest.TestCase):
                                'recommend', 'checkpoints', '--lexical'], capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(json.loads(proc.stdout), self.service.recommend('checkpoints', lexical_only=True))
-
 
 
 class RagPortabilityTests(unittest.TestCase):
