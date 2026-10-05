@@ -1,5 +1,6 @@
 import copy
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -91,9 +92,12 @@ class CatalogPRTests(unittest.TestCase):
 
     def test_closed_pr_is_respected_and_existing_open_pr_is_reused(self):
         for state in ('OPEN', 'CLOSED', 'MERGED'):
-            existing = {'state': state, 'url': 'https://github.com/example/catalog/pull/1'}
+            existing = {'state': state, 'url': 'https://github.com/example/catalog/pull/1',
+                        'isCrossRepository': False}
             self.assertEqual(catalog_pr.existing_pr([existing]), existing)
         self.assertIsNone(catalog_pr.existing_pr([]))
+        self.assertIsNone(catalog_pr.existing_pr([
+            {'state': 'OPEN', 'url': 'https://github.com/example/catalog/pull/2', 'isCrossRepository': True}]))
 
     def test_repo_identity_rejects_different_remotes_and_embedded_credentials(self):
         for remote in ('https://github.com/example/catalog.git', 'git@github.com:example/catalog.git'):
@@ -102,6 +106,70 @@ class CatalogPRTests(unittest.TestCase):
                        'https://github.com/other/catalog.git', '/tmp/catalog'):
             with self.assertRaises(ValueError):
                 catalog_pr.check_remote(remote, 'example/catalog')
+
+    def test_every_push_destination_must_match_the_explicit_repository(self):
+        catalog_pr.check_push_destinations('https://github.com/example/catalog.git\n'
+                                           'git@github.com:example/catalog.git', 'example/catalog')
+        with self.assertRaises(ValueError):
+            catalog_pr.check_push_destinations('https://github.com/example/catalog.git\n'
+                                               'https://github.com/other/catalog.git', 'example/catalog')
+        with self.assertRaises(ValueError):
+            catalog_pr.check_push_destinations('', 'example/catalog')
+
+    def test_publisher_gh_calls_stay_on_github_com(self):
+        observed = {}
+        def invoke(args, **kwargs):
+            observed.update(kwargs.get('env', {}))
+            return SimpleNamespace(returncode=0, stdout='{}', stderr='')
+        with patch.dict(os.environ, {'GH_HOST': 'unrelated.example'}), patch.object(catalog_pr.subprocess, 'run', side_effect=invoke):
+            catalog_pr.run('gh', 'api', 'user')
+        self.assertEqual(observed.get('GH_HOST'), 'github.com')
+
+    def test_push_does_not_publish_tags_from_user_git_configuration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, remote = Path(tmp) / 'source', Path(tmp) / 'remote.git'
+            execute = catalog_pr.run
+            execute('git', 'init', '-q', root)
+            execute('git', 'init', '--bare', '-q', remote)
+            (root / 'file').write_text('Reviewed data')
+            execute('git', 'add', '.', cwd=root)
+            execute('git', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                    'commit', '-qm', 'Fixture', cwd=root)
+            execute('git', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                    'tag', '-a', 'personal-tag', '-m', 'Private tag message', cwd=root)
+            execute('git', 'config', 'push.followTags', 'true', cwd=root)
+            execute('git', 'remote', 'add', 'origin', remote, cwd=root)
+            catalog_pr.push_candidate(root, 'catalog/add-new-tool')
+            self.assertEqual(execute('git', 'ls-remote', '--tags', remote), '')
+            self.assertIn('refs/heads/catalog/add-new-tool', execute('git', 'ls-remote', '--heads', remote))
+
+    def test_orphan_recovery_keeps_original_date_and_base_after_main_advances(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'scripts').mkdir()
+            (root / 'manifest.json').write_text(json.dumps({'tools': [entry('old')]}))
+            (root / 'scripts/generate_catalog_docs.py').write_text("CATEGORIES = {'Tools': ['old']}\n")
+            execute = catalog_pr.run
+            execute('git', 'init', '-q', root)
+            def commit():
+                execute('git', 'add', '.', cwd=root)
+                execute('git', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                        'commit', '-qm', 'Fixture', cwd=root)
+                return execute('git', 'rev-parse', 'HEAD', cwd=root)
+            base = commit()
+            catalog_pr.write_candidate(root, entry(), 'Games', revision_date='2026-10-01')
+            pushed = commit()
+            execute('git', 'checkout', '--detach', base, cwd=root)
+            (root / 'unrelated.txt').write_text('New main commit on another day')
+            latest_main = commit()
+            old_base, revision_date = catalog_pr.recovery_context(root, latest_main, pushed)
+            self.assertEqual(old_base, base)
+            self.assertEqual(revision_date, '2026-10-01')
+            with catalog_pr.isolated_tree(root, old_base) as candidate:
+                catalog_pr.write_candidate(candidate, entry(), 'Games', revision_date=revision_date)
+                execute('git', 'add', '.', cwd=candidate)
+                self.assertEqual(execute('git', 'write-tree', cwd=candidate),
+                                 execute('git', 'rev-parse', f'{pushed}^{{tree}}', cwd=candidate))
 
     def test_failed_validation_or_changed_input_never_pushes_and_preserves_source(self):
         for scenario in ('failed-tests', 'changed-input', 'failed-secret-scan', 'dry-run'):
@@ -130,6 +198,10 @@ class CatalogPRTests(unittest.TestCase):
                 def boundary(*args, **kwargs):
                     if args[:2] == ('gh', 'api'):
                         return 'a' * 40
+                    if args[:3] == ('git', 'remote', 'get-url'):
+                        return 'https://github.com/example/catalog.git'
+                    if args[:2] == ('git', 'ls-remote'):
+                        return ''
                     if args[0] == 'fake-gitleaks':
                         if scenario == 'failed-secret-scan':
                             raise RuntimeError('Secret scan failed')

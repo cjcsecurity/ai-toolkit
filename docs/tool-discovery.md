@@ -50,9 +50,13 @@ configured topic tags.
 ## Issue state and failure behavior
 
 The script reads every page of open **and closed** repository issues using
-[`gh api --paginate --slurp`](https://cli.github.com/manual/gh_api). Only issue
-bodies beginning with the exact `<!-- ai-toolkit-discovery:week YYYY-Www -->`
-marker belong to this job. Pull requests and other issues are ignored. Candidate
+[`gh api --paginate --slurp`](https://cli.github.com/manual/gh_api). It trusts
+issues authored by `github-actions[bot]` with account type `Bot`, or by the
+repository owner's login (case insensitive). Local publication should authenticate
+as that owner. Other authors, including members and collaborators, cannot supply
+discovery state. Trusted issue bodies must also begin with the exact
+`<!-- ai-toolkit-discovery:week YYYY-Www -->` marker to belong to this job.
+Pull requests and other issues are ignored. Candidate
 markers record previously reported repositories; closing a report therefore does
 not cause dismissed candidates to recur. Preserve those markers when editing.
 

@@ -33,7 +33,9 @@ GENERATOR = Path('scripts/generate_catalog_docs.py')
 def run(*args, cwd=None, timeout=180):
     result = subprocess.run([str(arg) for arg in args], cwd=cwd, text=True,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                            timeout=timeout)
+                            timeout=timeout,
+                            env={**os.environ, 'GH_HOST': 'github.com',
+                                 'GH_PROMPT_DISABLED': '1', 'GIT_TERMINAL_PROMPT': '0'})
     if result.returncode:
         # Do not reproduce potentially private metadata in scheduler logs.
         raise RuntimeError(f'{Path(str(args[0])).name} {args[1]} failed (exit {result.returncode})')
@@ -51,6 +53,13 @@ def check_remote(remote, repository):
                 f'git@github.com:{repository}', f'git@github.com:{repository}.git'}
     if remote not in expected:
         raise ValueError('Source origin does not match the explicit GitHub repository')
+
+
+def check_push_destinations(remotes, repository):
+    if not remotes.splitlines():
+        raise ValueError('Missing push destination')
+    for remote in remotes.splitlines():
+        check_remote(remote, repository)
 
 
 def validate_entry(tool):
@@ -156,12 +165,12 @@ def add_category(source, category, ident):
     return (encoded[:pos] + addition.encode() + encoded[pos:]).decode()
 
 
-def write_candidate(root, tool, category):
+def write_candidate(root, tool, category, *, revision_date=None):
     manifest = root / 'manifest.json'
     data = json.loads(manifest.read_text())
     data['tools'].append(tool)
     data['tools'].sort(key=lambda x: x['id'])
-    data['catalog_revision_date'] = date.today().isoformat()
+    data['catalog_revision_date'] = revision_date or date.today().isoformat()
     manifest.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
     script = root / GENERATOR
     script.write_text(add_category(script.read_text(), category, tool['id']))
@@ -169,7 +178,23 @@ def write_candidate(root, tool, category):
 
 def existing_pr(prs):
     # A closed PR is a deliberate review decision, not a request to recreate it.
+    # A matching branch name in an unrelated fork must not suppress this queue.
+    prs = [pr for pr in prs if pr.get('isCrossRepository') is False]
     return next((pr for pr in prs if pr['state'] == 'OPEN'), prs[0] if prs else None)
+
+
+def recovery_context(source, base, pushed):
+    # Rebuild from the original published ancestor and date, not today's main.
+    # The complete reconstructed tree must match before this branch is reused.
+    ancestor = run('git', 'merge-base', base, pushed, cwd=source)
+    data = json.loads(run('git', 'show', f'{pushed}:manifest.json', cwd=source))
+    revision = date.fromisoformat(data['catalog_revision_date']).isoformat()
+    return ancestor, revision
+
+
+def push_candidate(root, branch):
+    # An inherited push.followTags setting must not publish unreviewed refs.
+    run('git', 'push', '--no-follow-tags', 'origin', f'HEAD:refs/heads/{branch}', cwd=root)
 
 
 @contextmanager
@@ -187,15 +212,26 @@ def publish_addition(args, tool, category, base, snapshot):
     ident = tool['id']
     branch = f'catalog/add-{ident}'
     prior = existing_pr(gh_json('pr', 'list', '--repo', args.repository, '--head', branch,
-                                '--state', 'all', '--limit', '100', '--json', 'state,url'))
+                                '--state', 'all', '--limit', '100', '--json', 'state,url,isCrossRepository'))
     if prior:
         print(f"{ident}: {prior['state'].lower()} PR already exists: {prior['url']}")
         return
     upstream = run('gh', 'api', f"repos/{tool['repo']}/commits/{tool['commit']}", '--jq', '.sha')
     if upstream != tool['commit']:
         raise ValueError(f'{ident}: upstream source revision could not be verified')
+    check_push_destinations(run('git', 'remote', 'get-url', '--push', '--all', 'origin',
+                                cwd=args.source), args.repository)
+    # An earlier push may have succeeded even when PR creation timed out.
+    remote = run('git', 'ls-remote', '--heads', 'origin', f'refs/heads/{branch}', cwd=args.source)
+    pushed, revision_date = None, None
+    if remote:
+        pushed = remote.split()[0]
+        if not re.fullmatch(r'[0-9a-f]{40}', pushed):
+            raise ValueError('Invalid remote branch response')
+        run('git', 'fetch', 'origin', f'refs/heads/{branch}', cwd=args.source)
+        base, revision_date = recovery_context(args.source, base, pushed)
     with isolated_tree(args.source, base) as root:
-        write_candidate(root, tool, category)
+        write_candidate(root, tool, category, revision_date=revision_date)
         run(sys.executable, GENERATOR, cwd=root)
         run(sys.executable, GENERATOR, '--check', cwd=root)
         run(sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-q', cwd=root, timeout=300)
@@ -208,24 +244,21 @@ def publish_addition(args, tool, category, base, snapshot):
         run('git', 'diff', '--cached', '--check', cwd=root)
         run(args.gitleaks, 'git', '--staged', '--redact', '--no-banner',
             '--ignore-gitleaks-allow', '--config', '.gitleaks.toml', cwd=root)
+        if pushed and run('git', 'write-tree', cwd=root) != run('git', 'rev-parse', f'{pushed}^{{tree}}', cwd=root):
+            raise ValueError('Previously pushed branch differs from the validated addition; reconcile manually')
         if any(path.read_bytes() != content for path, content in snapshot.items()):
             raise RuntimeError('Local catalog changed during validation; retry after editing finishes')
         print(f'{ident}: validated catalog, documentation, tests, upstream pin and secrets')
         if not args.publish:
             print(f'{ident}: dry run; would open {branch}')
             return
-        check_remote(run('git', 'remote', 'get-url', '--push', 'origin', cwd=root), args.repository)
-        user = gh_json('api', 'user')
-        email = f"{user['id']}+{user['login']}@users.noreply.github.com"
-        run('git', '-c', f"user.name={user['login']}", '-c', f'user.email={email}',
-            'commit', '-m', f'Add {ident} to the reviewed tool catalog', cwd=root)
-        # Reuse an orphaned pushed branch only when its entire tree agrees.
-        remote = run('git', 'ls-remote', '--heads', 'origin', f'refs/heads/{branch}', cwd=root)
-        if remote:
-            run('git', 'fetch', 'origin', f'refs/heads/{branch}', cwd=root)
-            run('git', 'diff', '--exit-code', 'FETCH_HEAD', 'HEAD', cwd=root)
-        else:
-            run('git', 'push', 'origin', f'HEAD:refs/heads/{branch}', cwd=root)
+        check_push_destinations(run('git', 'remote', 'get-url', '--push', '--all', 'origin', cwd=root), args.repository)
+        if not pushed:
+            user = gh_json('api', 'user')
+            email = f"{user['id']}+{user['login']}@users.noreply.github.com"
+            run('git', '-c', f"user.name={user['login']}", '-c', f'user.email={email}',
+                'commit', '-m', f'Add {ident} to the reviewed tool catalog', cwd=root)
+            push_candidate(root, branch)
         body = root.parent / 'pr-body.md'
         body.write_text(
             f'Adds `{ident}` from [{tool["repo"]}]({tool["url"]}) at reviewed source '

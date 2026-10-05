@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from scripts import discover_tools as discovery
 
 TODAY = date(2026, 10, 5)
+BOT = {"login": "github-actions[bot]", "type": "Bot"}
 
 
 def config():
@@ -171,7 +172,7 @@ class DiscoveryCommandTests(unittest.TestCase):
 
     def test_existing_week_skips_closed_issue_and_preserves_human_notes(self):
         body = "<!-- ai-toolkit-discovery:week 2026-W41 -->\nHuman notes: keep this."
-        self.pages = [[], [dict(number=8, state="closed", body=body)]]
+        self.pages = [[], [dict(number=8, state="closed", body=body, user=BOT)]]
         code, report, error = self.invoke(publish=True)
         self.assertEqual((code, error), (0, ""))
         self.assertIn("already exists", report)
@@ -182,7 +183,7 @@ class DiscoveryCommandTests(unittest.TestCase):
 
     def test_previous_closed_reports_suppress_seen_repositories(self):
         body = "<!-- ai-toolkit-discovery:week 2026-W40 -->\n<!-- ai-toolkit-discovery:candidate EXAMPLE/tool -->"
-        self.pages = [[], [dict(number=5, state="closed", body=body)]]
+        self.pages = [[], [dict(number=5, state="closed", body=body, user=BOT)]]
         code, report, error = self.invoke(publish=True)
         self.assertEqual((code, error), (0, ""))
         self.assertIn("No new qualifying candidates", report)
@@ -190,13 +191,40 @@ class DiscoveryCommandTests(unittest.TestCase):
 
     def test_other_issues_and_pull_requests_do_not_suppress_candidates(self):
         marker = "<!-- ai-toolkit-discovery:week 2026-W41 -->\n<!-- ai-toolkit-discovery:candidate example/tool -->"
-        self.pages = [[dict(number=2, body="Human discussion quoting:\n" + marker),
-                       dict(number=3, body=marker, pull_request={"url": "ignored"}),
-                       dict(number=4, body="<!-- thin-loop -->\n" + marker)]]
+        self.pages = [[dict(number=2, body="Human discussion quoting:\n" + marker, user=BOT),
+                       dict(number=3, body=marker, pull_request={"url": "ignored"}, user=BOT),
+                       dict(number=4, body="<!-- thin-loop -->\n" + marker, user=BOT)]]
         code, report, error = self.invoke()
         self.assertEqual((code, error), (0, ""))
         self.assertIn("example/tool", report)
         self.assertEqual(len(self.reads), 8)
+
+    def test_untrusted_authors_cannot_suppress_week_or_candidates(self):
+        users = [None, {"login": "public-user", "type": "User"},
+                 {"login": "github-actions[bot]", "type": "User"},
+                 {"login": "other-app[bot]", "type": "Bot"}]
+        for user in users:
+            for week in ("2026-W40", "2026-W41"):
+                with self.subTest(user=user, week=week):
+                    self.reads.clear()
+                    body = f"<!-- ai-toolkit-discovery:week {week} -->\n<!-- ai-toolkit-discovery:candidate example/tool -->"
+                    self.pages = [[dict(number=9, body=body, user=user, author_association="MEMBER")]]
+                    code, report, error = self.invoke()
+                    self.assertEqual((code, error), (0, ""))
+                    self.assertIn("https://github.com/example/tool", report)
+                    self.assertEqual(len(self.reads), 8)
+
+    def test_repository_owner_reports_are_trusted_case_insensitively(self):
+        self.args[1] = "CATALOG/toolkit"
+        for week, expected in [("2026-W40", "No new qualifying candidates"),
+                               ("2026-W41", "already exists")]:
+            with self.subTest(week=week):
+                body = f"<!-- ai-toolkit-discovery:week {week} -->\n<!-- ai-toolkit-discovery:candidate example/tool -->"
+                self.pages = [[dict(number=9, body=body, user={"login": "Catalog", "type": "User"})]]
+                code, report, error = self.invoke(publish=True)
+                self.assertEqual((code, error), (0, ""))
+                self.assertIn(expected, report)
+                self.assertEqual(self.writes, [])
 
     def test_api_failures_on_history_or_last_search_never_publish(self):
         for failure in (1, 8):

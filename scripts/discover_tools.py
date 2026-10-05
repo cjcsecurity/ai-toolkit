@@ -134,6 +134,13 @@ def discover(config, manifest, repo, publish, today):
         for issue in page:
             if not isinstance(issue, dict):
                 raise ValueError("Invalid GitHub issue history response")
+            user = issue.get("user") or {}
+            if not isinstance(user, dict):
+                continue
+            login = str(user.get("login", "")).lower()
+            if not (login == repo.split("/")[0]
+                    or (login == "github-actions[bot]" and user.get("type") == "Bot")):
+                continue
             body = issue.get("body") or ""
             marker = WEEK_MARKER.match(body)
             if not marker or "pull_request" in issue:
