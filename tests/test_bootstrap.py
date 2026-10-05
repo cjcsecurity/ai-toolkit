@@ -125,5 +125,20 @@ class SourceSyncTests(unittest.TestCase):
         self.assertFalse((self.root / 'runtime').exists())
 
 
+class SemanticRuntimeTests(unittest.TestCase):
+    def test_semantic_probe_requires_python_supported_by_pinned_dependencies(self):
+        from scripts.bootstrap import compatible_python
+        with tempfile.TemporaryDirectory() as directory:
+            probe = Path(directory) / 'python-probe'
+            for version, expected in [((3, 11), False), ((3, 12), True),
+                                      ((3, 13), True), ((3, 14), False)]:
+                with self.subTest(version=version):
+                    # Simulate interpreter versions while running the real probe code.
+                    probe.write_text(f'#!{sys.executable}\nimport sys\n'
+                                     f'sys.version_info = {version!r}\nexec(sys.argv[2])\n')
+                    probe.chmod(0o755)
+                    self.assertEqual(compatible_python(str(probe)), expected)
+
+
 if __name__ == '__main__':
     unittest.main()

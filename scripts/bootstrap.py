@@ -23,7 +23,7 @@ def run(command: list[str], root: Path) -> None:
 
 def compatible_python(executable: str) -> bool:
     probe = subprocess.run([executable, '-c',
-        'import sys; sys.exit(not ((3, 11) <= sys.version_info[:2] <= (3, 13)))'],
+        'import sys; sys.exit(not ((3, 12) <= sys.version_info[:2] <= (3, 13)))'],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return probe.returncode == 0
 
@@ -34,17 +34,17 @@ def semantic_runtime(root: Path) -> Path:
     uv = shutil.which('uv')
     if runtime.exists():
         if not python.exists() or not compatible_python(str(python)):
-            raise ValueError(f'{runtime} is not a compatible Python 3.11–3.13 environment; move it aside and retry')
+            raise ValueError(f'{runtime} is not a compatible Python 3.12–3.13 environment; move it aside and retry')
     else:
         runtime.parent.mkdir(parents=True, exist_ok=True)
         if uv:
             run([uv, 'venv', '--python', '3.12', str(runtime)], root)
         else:
-            candidates = [shutil.which(name) for name in ['python3.12', 'python3.11', 'python3.13']]
+            candidates = [shutil.which(name) for name in ['python3.12', 'python3.13']]
             candidates.append(sys.executable)
             selected = next((candidate for candidate in candidates if candidate and compatible_python(candidate)), None)
             if not selected:
-                raise ValueError('Semantic search requires Python 3.11–3.13 (3.12 recommended). Install uv or a compatible Python; lexical mode works on Python 3.11+.')
+                raise ValueError('Semantic search requires Python 3.12–3.13 (3.12 recommended). Install uv or a compatible Python; lexical mode works on Python 3.11+.')
             run([selected, '-m', 'venv', str(runtime)], root)
     if uv:
         run([uv, 'pip', 'install', '--python', str(python), '-r', str(root / 'requirements-search.txt')], root)
