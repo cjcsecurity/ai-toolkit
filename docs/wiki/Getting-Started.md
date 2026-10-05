@@ -19,10 +19,10 @@ Use `bin/toolkit read humanizer PATH_FROM_RESULTS` to read a returned skill path
 | --- | --- | --- |
 | `python3 scripts/bootstrap.py` | No upstream clones | Catalog-only lexical index |
 | `python3 scripts/bootstrap.py --repo humanizer --lexical` | Selected pinned source | Catalog and available source lexical index |
-| `python3 scripts/bootstrap.py --all --lexical` | All 60 pinned sources | Lexical index |
-| `python3 scripts/bootstrap.py --all --semantic` | All 60 pinned sources | Local hybrid lexical/vector index |
+| `python3 scripts/bootstrap.py --all --lexical` | All cataloged pinned sources | Lexical index |
+| `python3 scripts/bootstrap.py --all --semantic` | All cataloged pinned sources | Local hybrid lexical/vector index |
 
-Bootstrap source downloads and semantic setup use the network. Semantic setup creates `runtime/search`, installs pinned dependencies, downloads the reviewed MiniLM ONNX checkpoint, and indexes locally. `uv` is recommended for provisioning Python 3.12; without it, use an existing supported Python 3.11–3.13 interpreter with venv support. A cold full-source semantic index can reach roughly 150,000 passages and take tens of minutes to hours depending on CPU. Selected-source setup is the practical starting point. Application runtimes remain a separate task.
+Bootstrap source downloads and semantic setup use the network. Semantic setup creates `runtime/search`, installs pinned dependencies, downloads the reviewed MiniLM ONNX checkpoint, and indexes locally. `uv` is recommended for provisioning Python 3.12; without it, use an existing supported Python 3.12–3.13 interpreter with venv support. A cold full-source semantic index can reach roughly 150,000 passages and take tens of minutes to hours depending on CPU. Selected-source setup is the practical starting point. Application runtimes remain a separate task.
 
 ## Search in two stages
 

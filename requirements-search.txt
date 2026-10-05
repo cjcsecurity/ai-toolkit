@@ -2,7 +2,7 @@ anyio==4.15.1
 certifi==2026.7.22
 charset-normalizer==3.5.2
 click==8.5.0
-fastembed==0.7.4
+fastembed==0.8.0
 filelock==4.0.8
 flatbuffers==25.12.19
 fsspec==2026.9.0
@@ -17,7 +17,7 @@ mmh3==5.3.1
 numpy==2.5.3
 onnxruntime==1.30.0
 packaging==26.3
-pillow==11.3.0
+pillow==12.3.0
 protobuf==7.36.2
 py-rust-stemmers==0.1.8
 pyyaml==6.0.3
