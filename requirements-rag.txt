@@ -89,9 +89,9 @@ loguru==0.7.3
     # via
     #   -r requirements-search.txt
     #   fastembed
-mcp==2.2.0
+mcp==2.3.0
     # via -r requirements-rag.in
-mcp-types==2.2.0
+mcp-types==2.3.0
     # via mcp
 mmh3==5.3.1
     # via
@@ -133,7 +133,7 @@ pydantic==2.13.5
     #   mcp-types
 pydantic-core==2.46.5
     # via pydantic
-pyjwt==2.15.1
+pyjwt[crypto]==2.15.1
     # via mcp
 python-multipart==0.0.32
     # via mcp
@@ -176,15 +176,12 @@ typing-extensions==4.16.0
     # via
     #   -r requirements-search.txt
     #   anyio
-    #   httpx2
     #   huggingface-hub
     #   mcp
     #   mcp-types
     #   opentelemetry-api
     #   pydantic
     #   pydantic-core
-    #   referencing
-    #   starlette
     #   typing-inspection
 typing-inspection==0.4.4
     # via
