@@ -43,6 +43,8 @@ CATEGORIES = {
         'brag', 'humanizer', 'hyperframes', 'hypit', 'pixelle-video',
         'recordly', 'voicestudio',
     ],
+
+    'Games and modding': ['universal-modder'],
 }
 
 

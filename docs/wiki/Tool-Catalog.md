@@ -1,6 +1,6 @@
 # Tool catalog
 
-**60 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**61 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -98,3 +98,9 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [pixelle-video](tools/pixelle-video.md) | application | 0 | Python/Streamlit short-video creation platform combining LLM scripts, image/video workflows, speech, templates, background music, and FFmpeg composition. |
 | [recordly](tools/recordly.md) | application | 0 | Electron desktop screen recorder and editor with automatic zooms, cursor effects, webcam overlays, timeline editing, and video/GIF export. |
 | [voicestudio](tools/voicestudio.md) | application | 2 | Local speech studio with Electron desktop, voice cloning and design, transcription, dubbing, audiobooks, a REST API and an optional MCP connection to its running backend. |
+
+## Games and modding
+
+| Tool | Type | Skills | Purpose |
+| --- | --- | ---: | --- |
+| [universal-modder](tools/universal-modder.md) | cli-and-skill-bundle | 10 | Game-modding skills and Python CLI for engine recon, reverse engineering, sprite and 3D-to-sprite pipelines, Windows capture, video editing, packaging checks and shared field notes. |
