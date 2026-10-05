@@ -13,3 +13,15 @@ __pycache__/
 .env.*
 !.env.example
 .DS_Store
+
+# Local media tooling and private release material
+node_modules
+.hyperframes/
+.serena/
+/docs/launch/
+/linkedin-kit/
+/dist/
+
+# Generated local evaluations and workstation review material
+/reviews/
+/design-plan.json

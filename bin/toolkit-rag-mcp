@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch the toolkit from any working directory or symlink."""
+"""Launch the local RAG server from any working directory or symlink."""
 import os
 from pathlib import Path
 import sys
@@ -9,5 +9,5 @@ if sys.version_info < (3, 11):
 code = Path(__file__).resolve().parents[1]
 root = Path(os.environ.get('AI_TOOLKIT_HOME', code)).expanduser().resolve()
 python = root / 'runtime/search/bin/python'
-executable = str(python) if python.is_file() else sys.executable
+executable = os.environ.get('TOOLKIT_PYTHON') or (str(python) if python.is_file() else sys.executable)
 os.execv(executable, [executable, str(code / 'rag_server.py'), *sys.argv[1:]])
