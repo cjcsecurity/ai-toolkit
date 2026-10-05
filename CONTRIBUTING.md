@@ -30,6 +30,20 @@ Tests that require optional dependencies or the real checkpoint may be skipped i
 
 A pull request should state the problem, the resulting behavior, relevant validation, and any platform or setup limits. Include changes to generated documentation when source pins or catalog metadata change.
 
+## Dependency updates
+
+After changing `requirements-search.txt`, regenerate the combined RAG lock with the existing pins as the starting point:
+
+```bash
+uv pip compile requirements-rag.in --python 3.12 --output-file requirements-rag.txt
+```
+
+When updating FastEmbed, also update `FASTEMBED_VERSION` in `embeddings.py` and run the real-model tests in an isolated optional environment. The standard-library suite checks that the runtime guard matches both dependency files. CI installs both files together so divergent pins fail resolution, even when the model checkpoint is unavailable.
+
+Review upstream dependency bounds before accepting major-version updates. The Dependabot exclusion for Hugging Face Hub 2.x and later reflects FastEmbed's current `<2.0` requirement; remove it when the selected FastEmbed release supports those versions.
+
+Embedding runtime upgrades change the embedding fingerprint. Rebuild semantic indexes after upgrading with `bin/toolkit index --semantic`; retain the old runtime and index until ready to rebuild.
+
 ## Before publishing
 
 Review the staged diff and filenames. With [Gitleaks](https://github.com/gitleaks/gitleaks) installed, scan reachable history and the staged changes:

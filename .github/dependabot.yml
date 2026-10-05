@@ -17,6 +17,10 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # FastEmbed requires huggingface-hub<2. Remove when its bound changes.
+      - dependency-name: huggingface-hub
+        versions: ['>=2.0.0']
     groups:
       python:
         patterns: ['*']

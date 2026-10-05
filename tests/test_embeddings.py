@@ -11,6 +11,13 @@ AVAILABLE = importlib.util.find_spec('fastembed') is not None
 
 
 class LocalEmbeddingTests(unittest.TestCase):
+    def test_runtime_version_matches_dependency_pins(self):
+        from embeddings import FASTEMBED_VERSION
+        for filename in ('requirements-search.txt', 'requirements-rag.txt'):
+            with self.subTest(filename=filename):
+                self.assertIn(f'fastembed=={FASTEMBED_VERSION}',
+                              (ROOT / filename).read_text().splitlines())
+
     def test_missing_model_fails_locally_with_setup_instructions(self):
         from embeddings import LocalEmbedder
         with tempfile.TemporaryDirectory() as directory:
