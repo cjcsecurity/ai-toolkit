@@ -66,8 +66,9 @@ bin/toolkit read serena README.md --offset 8000
 
 Use the continuation offset reported by `read` instead of guessing when possible. A clipped excerpt is not a complete skill. Read only the selected instructions and their necessary references, then reuse the project selection until the task changes.
 
-[Back to the wiki](Home.md)
 
 ## Project RAG and MCP
 
 The [RAG service](../rag.md) builds project-level evidence bundles from this index, with capability diversity, verified citations, character budgets and explicit fallback status. Use `bin/toolkit recommend "project outcome"` or connect a local MCP host. The calling agent generates the answer; see the [agent demonstration](../rag-demo.md) and reproducible evaluation in the RAG guide.
+
+[Back to the wiki](Home.md)

@@ -108,9 +108,12 @@ class PortabilityTests(unittest.TestCase):
         self.assertIn('requirements-mcp.txt', result.stderr)
 
     def test_chrome_wrapper_requires_explicit_local_configuration(self):
-        wrapper = CODE / 'bin/toolkit-chrome-mcp'
+        wrapper = self.root / 'bin/toolkit-chrome-mcp'
+        wrapper.parent.mkdir()
+        shutil.copy2(CODE / 'bin/toolkit-chrome-mcp', wrapper)
         self.assertTrue(wrapper.is_file(), 'local-only Chrome launcher must be distributed')
         env = {k: v for k, v in os.environ.items() if not k.startswith('TOOLKIT_')}
+        env['AI_TOOLKIT_HOME'] = str(self.root)
         result = subprocess.run([str(wrapper)], env=env, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('TOOLKIT_CHROME_MCP_ENTRY', result.stderr)
@@ -129,6 +132,37 @@ class PortabilityTests(unittest.TestCase):
             result = subprocess.run([str(wrapper), flag], env=env, capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0, flag)
             self.assertIn('isolated launcher', result.stderr)
+
+    def test_chrome_wrapper_reuses_portable_installed_runtime_and_honors_overrides(self):
+        wrapper = self.root / 'bin/toolkit-chrome-mcp'
+        wrapper.parent.mkdir()
+        shutil.copy2(CODE / 'bin/toolkit-chrome-mcp', wrapper)
+        runtime = self.root / 'runtime/chrome-devtools'
+        entry = runtime / 'node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js'
+        entry.parent.mkdir(parents=True)
+        entry.write_text('import json, sys; print(json.dumps({"server": "installed", "args": sys.argv[1:]}))')
+        chrome = runtime / 'browser/chrome-linux64/chrome'
+        chrome.parent.mkdir(parents=True)
+        chrome.symlink_to(sys.executable)
+        env = {key: value for key, value in os.environ.items()
+               if not key.startswith('TOOLKIT_') and key != 'AI_TOOLKIT_HOME'}
+        env['TOOLKIT_NODE'] = sys.executable
+        alias = Path(self.tmp.name) / 'chrome alias'
+        alias.symlink_to(wrapper)
+        result = subprocess.run([str(alias)], cwd=self.tmp.name, env=env,
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(data['server'], 'installed')
+        self.assertIn(str(chrome), data['args'])
+        override = self.root / 'selected server.py'
+        override.write_text('import json, sys; print(json.dumps({"server": "selected", "args": sys.argv[1:]}))')
+        env.update(TOOLKIT_CHROME_MCP_ENTRY=str(override), TOOLKIT_CHROME_EXECUTABLE=sys.executable)
+        result = subprocess.run([str(alias)], cwd=self.tmp.name, env=env,
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['server'], 'selected')
+        self.assertIn(sys.executable, json.loads(result.stdout)['args'])
 
 
 if __name__ == '__main__':

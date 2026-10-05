@@ -1,96 +1,161 @@
 # AI Toolkit
 
-**Find the right tool. Read the relevant skill. Keep the rest out of context.**
+![AI Toolkit: a growing library, a useful way through. Curated tools with local retrieval and source evidence.](docs/assets/readme-hero.png)
 
 [![CI](https://github.com/cjcsecurity/ai-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/cjcsecurity/ai-toolkit/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](docs/wiki/Getting-Started.md)
-[![60 catalog tools](https://img.shields.io/badge/catalog-60_tools-2563EB)](docs/wiki/Tool-Catalog.md)
-[![License: MIT](https://img.shields.io/badge/manager-MIT-16A34A)](LICENSE)
+[![Curated library](https://img.shields.io/badge/library-personally_curated-1E5CC6)](docs/wiki/Tool-Catalog.md)
+[![License: MIT](https://img.shields.io/badge/manager-MIT-163C35)](LICENSE)
 
-A portable, reviewed library of **60 open-source tools and skill collections**, with local search over repository summaries, individual skills, and documentation. Built for agents and people who want useful capabilities without loading every skill into every conversation.
+**A growing personal library of tools worth exploring, with the context to put them to work.**
 
-Compare systems first, then retrieve the precise instructions your task needs. Start with dependency-free lexical search; add local semantic search when you want meaning-based matches. Neither search mode needs a model API key.
+I keep AI Toolkit as a curated collection of open-source tools and agent skills I've reviewed. Some are part of my working setup; others are tools I want to explore. The catalog records their purpose, requirements, setup guidance, and source revision, so a useful find does not disappear into a bookmark folder.
 
-## Contents
+The Python CLI searches repository summaries, individual skills, and documentation from local source copies. Compare candidates, check what they need to run, and retrieve the instructions that fit the task. The collection grows as I find and review useful tools; inclusion does not mean every tool is installed or used daily.
 
-- [Start small](#start-small)
-- [How discovery works](#how-discovery-works)
-- [RAG for your agent](#rag-for-your-agent)
-- [Tool catalog — all 60 tools](#tool-catalog)
-- [Connect your agent](#connect-your-agent)
-- [Availability is explicit](#availability-is-explicit)
-- [Documentation and wiki](#documentation-and-wiki)
+Search runs locally: start with Python's standard library and SQLite, then add semantic retrieval when you need matches by meaning. Neither mode needs a model API key. The CLI and optional MCP server can also assemble cited evidence for your agent to turn into a recommendation. Integrations are available for Codex and OpenCode.
 
-## Start small
+[Quick start](#quick-start) · [See it in action](#see-it-in-action) · [Engineering](#engineering) · [Browse the library](#tool-catalog) · [Wiki](docs/wiki/Home.md) · [Contributing](CONTRIBUTING.md)
 
-Requires Git and Python 3.11+ on Linux, macOS, or WSL. Native Windows is not verified; use WSL. Run these commands from a terminal:
+## See it in action
+
+This project's launch demo was made with tools found through the library: **Brag** for the story and **Hyperframes** for animation and rendering. Humanizer helped edit the copy; Semgrep scanned the Python manager.
+
+[![Animated demo: search for a launch-video tool, inspect Brag's source, and use the selected workflow.](docs/assets/toolkit-demo.gif)](docs/assets/ai-toolkit-demo.mp4)
+
+[Watch or download the 22-second video](docs/assets/ai-toolkit-demo.mp4) · [Static preview](docs/assets/poster.jpg) · [How it was made](docs/demo.md)
+
+The animation is a styled replay of actual CLI output, abridged for readability. The toolkit finds the workflow; the agent reads and uses the selected tools.
+
+## Quick start
+
+Requires **Git and Python 3.11+** on Linux, macOS, or WSL. Native Windows is not verified; use WSL.
 
 ```bash
 git clone https://github.com/cjcsecurity/ai-toolkit.git
 cd ai-toolkit
-python3 scripts/bootstrap.py --repo humanizer --lexical
-bin/toolkit search "edit prose to sound natural" --kind repo --limit 8
-bin/toolkit show humanizer
-bin/toolkit skills humanizer "editing prose"
+python3 scripts/bootstrap.py
+bin/toolkit search "launch video" --kind repo --limit 3 --lexical
 ```
 
-This downloads the pinned Humanizer source and builds a lexical index. The other entries remain searchable through their catalog summaries; their source files become available when you download them. To explore summaries without downloading any upstream source, run `python3 scripts/bootstrap.py` instead.
+This indexes the catalog summaries using the standard library. It downloads no upstream repositories or model files. An abridged result from the example:
 
-For all 60 source repositories and local semantic retrieval:
+```json
+{
+  "id": "brag",
+  "repo": "latent-spaces/brag",
+  "match_kind": "repo",
+  "retrieval": "lexical"
+}
+```
+
+Inspect a candidate, download its pinned source, then retrieve its instructions:
 
 ```bash
-python3 scripts/bootstrap.py --all --semantic
+bin/toolkit show brag
+python3 scripts/bootstrap.py --repo brag --lexical
+bin/toolkit skills brag "launch video" --limit 2 --lexical
+bin/toolkit --budget 12000 read brag skills/brag/SKILL.md
+```
+
+`show` explains requirements and setup. Bootstrap downloads source; a tool's application runtime is a separate setup step. The CLI reports whether each source exists on your machine.
+
+<details>
+<summary><strong>Add local semantic search</strong></summary>
+
+Start with the sources you need:
+
+```bash
+python3 scripts/bootstrap.py --repo brag --repo hyperframes --semantic
+bin/toolkit search "make a short film about my project" --kind repo
 bin/toolkit search-status
 ```
 
-This explicitly downloads upstream sources, installs isolated search dependencies, downloads a pinned ONNX model, and builds the index. A cold full index can contain roughly 150,000 passages and take tens of minutes to hours depending on CPU, alongside substantial source and model disk usage. Start with selected sources if you only need a few tools. [uv](https://docs.astral.sh/uv/) is recommended for Python 3.12 provisioning; the semantic setup also supports an existing Python 3.11–3.13 environment. It does **not** install the 60 tools' application runtimes.
+Semantic setup installs isolated dependencies, downloads a pinned ONNX model, and builds local embeddings. [uv](https://docs.astral.sh/uv/) is recommended for Python 3.12 provisioning; an existing Python 3.12–3.13 environment also works.
+
+For the entire library, use `python3 scripts/bootstrap.py --all --semantic`. A cold full index can contain roughly 150,000 passages and take tens of minutes to hours depending on CPU, with substantial source and model disk usage. It does not install the cataloged application runtimes. See [getting started](docs/wiki/Getting-Started.md) for setup options.
+
+</details>
 
 ## How discovery works
 
 ```mermaid
 flowchart LR
-    A[Project outcome] --> B[Compare repositories]
-    B --> C[Read setup requirements]
-    C --> D[Choose workflow and supporting tools]
-    D --> E[Search capabilities within selected repositories]
-    E --> F[Read full relevant skill or documentation]
-    F --> G[Configure and use selected tools]
+    A[Describe the task] --> B[Compare repositories]
+    B --> C[Inspect requirements]
+    C --> D[Search the selected source]
+    D --> E[Read the relevant instructions]
+    E --> F[Configure and use the tool]
 ```
 
+Repository search gives each system a comparison candidate, so a large skill collection cannot occupy every slot. After choosing a shortlist, search within it and read the complete relevant skill or guide.
+
 ```bash
-# 1. Give each system a chance to appear in the comparison.
-bin/toolkit search "browser automation and end-to-end tests" --kind repo --limit 8
+bin/toolkit search "browser automation" --kind repo --limit 8
 bin/toolkit show playwright
-
-# 2. Download the selected source, then retrieve a capability.
 python3 scripts/bootstrap.py --repo playwright --lexical
-bin/toolkit search "network mocking" --repo playwright
-bin/toolkit docs playwright "installation"
-
-# 3. Read a returned path, then record the project preference.
-bin/toolkit read playwright README.md
+bin/toolkit docs playwright "network mocking" --lexical
 bin/toolkit select playwright --project /path/to/project
 ```
 
-Repository-first discovery keeps a large skill bundle from taking every comparison slot. Ranking supplies candidates; the agent or reader still checks fit, requirements, and alternatives. Project selection records preferences and does not install packages or activate services.
+`select` records a project's preferences in `.ai-toolkit.json`; it does not install dependencies or start services. Rankings help with discovery. Inspect the requirements and source evidence before choosing a tool.
 
-## RAG for your agent
-
-Ask for a project recommendation with source evidence:
+## Recommendations with evidence
 
 ```bash
 bin/toolkit --budget 16000 recommend \
-  "End-to-end browser tests for my TypeScript application" \
-  --constraints "Headless CI; inspect installation requirements"
+  "Make a short launch video for my project" --limit 3 --lexical
 ```
 
-Local keyword and vector search retrieve repository summaries and internal skills/docs. The RAG service combines them into a diverse evidence bundle with source paths, line ranges, commit verification, prerequisites and explicit fallback status. Your agent generates the recommendation from that evidence. Constraints are context for the agent to assess, not automatic compatibility filters.
+`recommend` compares repository and capability matches, then returns a bounded evidence bundle with source IDs, paths, revision checks, and setup context. Your agent generates the recommendation from that evidence. Add `--project /path/to/project` to include saved tool preferences; explicit constraints remain context for the agent to assess.
 
-Shell-capable agents use the CLI; MCP-compatible hosts can use the optional stdio server's five tools. See the [RAG guide](docs/rag.md) for architecture, setup, host configuration and evaluation, and the [agent demonstration](docs/rag-demo.md) for a sourced answer from a real MCP session.
+The optional stdio MCP server exposes the same retrieval and evidence service to other hosts. [Set up RAG and MCP](docs/rag.md) for semantic recommendations, the source contract, and evaluation limits, or read the [recorded agent demonstration](docs/rag-demo.md).
+
+## Engineering
+
+The manager keeps discovery, source provisioning, and application setup separate. A catalog entry records reviewed metadata and an exact upstream commit. A downloaded checkout makes that source searchable. Runtime readiness depends on the selected tool's own dependencies and configuration.
+
+```mermaid
+flowchart LR
+    M[Reviewed manifest] --> C[Source-aware corpus]
+    S[Pinned local sources] --> C
+    C --> F[SQLite FTS5 / BM25]
+    C --> V[Optional MiniLM / ONNX]
+    F --> R[Reciprocal rank fusion]
+    V --> R
+    R --> O[Bounded results with source locations]
+    O --> E[Cited evidence via CLI or MCP]
+    E --> A[Your agent generates a recommendation]
+```
+
+| Decision | Why it matters | Implementation |
+| --- | --- | --- |
+| Standard-library lexical path | You can explore the catalog before installing a model runtime. | [toolkit.py](toolkit.py), [hybrid.py](hybrid.py) |
+| Local embeddings with a content-hash cache | Semantic retrieval needs no query API; unchanged passages reuse their vectors. | [embeddings.py](embeddings.py), [hybrid.py](hybrid.py) |
+| Paths, line ranges, and deduplicated capabilities | Matches are inspectable, and long manuals do not fill every result slot. | [corpus.py](corpus.py) |
+| Atomic index replacement and validated source paths | Failed builds preserve the published index; reads stay within the selected source. | [toolkit.py](toolkit.py), [source sync](scripts/sync_sources.py) |
+| Shared evidence service with source verification | Recommendations carry source IDs, revision checks, and explicit truncation; the calling agent supplies generation. | [RAG service](rag.py), [evidence contract](docs/rag.md) |
+| Bounded output and on-demand MCP sessions | Agents retrieve selected context and load tool schemas when needed. | [MCP client](mcp_client.py), [selector skill](skills/toolkit-selector/SKILL.md) |
+
+Only explicit setup downloads sources or models. Local retrieval does not make every catalog application offline; downstream services, credentials, and licenses belong to their respective tools. See [retrieval details](docs/wiki/Retrieval-System.md) and [security and privacy](docs/wiki/Security-and-Privacy.md).
+
+## Connect your agent
+
+```bash
+python3 scripts/install_agent.py --client both
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Registration installs the selector and command launchers for Codex and OpenCode. It preserves existing configuration and refuses conflicting destination files. Use `--client codex` or `--client opencode` to register one client. MCP adapters require [separate runtime setup](docs/wiki/Runtime-Setup.md).
+
+The selector teaches the agent to compare systems, retrieve relevant instructions, and reuse project choices. Specialized skills and MCP servers stay on demand. [Agent integration](docs/wiki/Codex-and-OpenCode.md) covers layout and scope. [Superpowers](https://github.com/obra/superpowers) is an optional complementary workflow, installed separately from the catalog.
 
 ## Tool catalog
 
-All **60 tools and collections** are listed below, grouped by their main use. Each tool name links to its detailed wiki page with requirements, setup instructions, and pinned upstream sources. The skill counts refer to cataloged paths, not globally installed skills.
+Browse [the full catalog](catalog.md) or expand the inventory below. Each tool links to a guide with requirements, setup options, and pinned upstream sources. Skill counts refer to cataloged paths, not globally installed skills.
+
+<details>
+<summary><strong>Tools and collections, grouped by use</strong></summary>
 
 ### Engineering and code intelligence
 
@@ -187,45 +252,32 @@ All **60 tools and collections** are listed below, grouped by their main use. Ea
 | [recordly](docs/wiki/tools/recordly.md) | application | 0 | Electron desktop screen recorder and editor with automatic zooms, cursor effects, webcam overlays, timeline editing, and video/GIF export. |
 | [voicestudio](docs/wiki/tools/voicestudio.md) | application | 2 | Local speech studio with Electron desktop, voice cloning and design, transcription, dubbing, audiobooks, a REST API and an optional MCP connection to its running backend. |
 
-## Connect your agent
+</details>
+
+## Development and verification
 
 ```bash
-python3 scripts/install_agent.py --client both
-export PATH="$HOME/.local/bin:$PATH"
+python3 -m unittest discover -s tests -v
+python3 scripts/generate_catalog_docs.py --check
 ```
 
-Registration installs the selector and command launchers (`toolkit`, `toolkit-mcp`, `toolkit-serena`, and `toolkit-chrome-mcp`) for Codex and OpenCode. MCP adapters require separate runtime setup. It preserves existing user configuration and refuses conflicting destination files. Register either client separately with `--client codex` or `--client opencode`. See [agent integration](docs/wiki/Codex-and-OpenCode.md) for layout and scope.
+CI exercises the standard-library path on Python 3.11, 3.12, and 3.13, plus a Python 3.12 job with optional vector and MCP dependencies. Tests cover source pinning, relocation, traversal protection, atomic rebuilds, retrieval, output budgets, and MCP lifecycle behavior. Optional real-model tests need the configured search runtime; skipped tests are reported explicitly.
 
-The selector teaches the agent to compare systems, retrieve only relevant instructions, and reuse a project's selection. Specialized skills and MCP servers stay on demand. [Superpowers](https://github.com/obra/superpowers) is an optional complementary engineering workflow, installed separately; it is not one of the 60 catalog entries.
+These checks validate the manager, not every upstream application's runtime. See [security and privacy](docs/wiki/Security-and-Privacy.md) for the project's trust boundaries.
 
-## Availability is explicit
-
-- **Cataloged:** reviewed metadata and a source revision are recorded.
-- **Source downloaded:** a pinned checkout is available for reading and indexing.
-- **Runtime configured:** the tool's own dependencies, services, credentials, and verification have been handled on your machine.
-
-Downloading a repository establishes only the second state. Read the tool's requirements before configuring it. Browser sessions, application credentials, paid APIs, and model providers are separate from local toolkit retrieval.
-
-```bash
-bin/toolkit --budget 30000 doctor
-bin/toolkit search-status
-```
-
-The default output budget is **8,000 characters**, not tokens. Put `--budget` before the command and use `read --offset` to continue longer files.
-
-## Documentation and wiki
+## Documentation
 
 | Guide | What you will find |
 | --- | --- |
-| [Wiki home](docs/wiki/Home.md) | Overview and how the documentation fits together |
-| [Getting started](docs/wiki/Getting-Started.md) | Small lexical install, full semantic install, and first searches |
-| [RAG and agent recommendations](docs/rag.md) | Cited evidence, MCP access, evaluation and limitations |
-| [Retrieval system](docs/wiki/Retrieval-System.md) | Corpus, local embeddings, keyword search, scoring, and limits |
-| [Codex and OpenCode](docs/wiki/Codex-and-OpenCode.md) | Client registration, global instructions, and on-demand skills |
-| [Runtime setup](docs/wiki/Runtime-Setup.md) | Application dependencies and optional MCP adapters |
-| [Maintenance](docs/wiki/Maintenance.md) | Source pins, updates, documentation generation, and indexing |
-| [Troubleshooting](docs/wiki/Troubleshooting.md) | Missing source, lexical fallback, registration conflicts, and runtime gaps |
-| [Security and privacy](docs/wiki/Security-and-Privacy.md) | Network boundaries, credentials, browser isolation, and provenance |
-| [Contributing](CONTRIBUTING.md) | Adding tools and updating reviewed catalog metadata |
+| [Wiki home](docs/wiki/Home.md) | Project overview and documentation map |
+| [Getting started](docs/wiki/Getting-Started.md) | Small lexical install, semantic setup, and first searches |
+| [Retrieval system](docs/wiki/Retrieval-System.md) | Corpus, embeddings, keyword ranking, and context budgets |
+| [Codex and OpenCode](docs/wiki/Codex-and-OpenCode.md) | Client registration and on-demand skills |
+| [Runtime setup](docs/wiki/Runtime-Setup.md) | Application dependencies and MCP adapters |
+| [Maintenance](docs/wiki/Maintenance.md) | Source pins, catalog generation, and indexing |
+| [Troubleshooting](docs/wiki/Troubleshooting.md) | Missing sources, fallback, and configuration conflicts |
+| [Security and privacy](docs/wiki/Security-and-Privacy.md) | Network boundaries, credentials, and provenance |
+| [Contributing](CONTRIBUTING.md) | Adding tools and updating reviewed metadata |
+| [Demo walkthrough](docs/demo.md) | A real discovery example and the tools used to create the video |
 
-The toolkit manager is MIT licensed. Upstream tools retain their own licenses, which are included in their downloaded repositories. A catalog entry is not an endorsement or a substitute for upstream documentation.
+The toolkit manager is [MIT licensed](LICENSE). Upstream tools retain their own licenses. Catalog membership describes reviewed source and requirements; it is not a blanket endorsement or a substitute for upstream documentation.
