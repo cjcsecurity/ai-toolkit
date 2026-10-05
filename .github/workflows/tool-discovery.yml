@@ -1,0 +1,32 @@
+# Adapted from cobusgreyling/loop-engineering's MIT-licensed thin-loop starter.
+# Source revision and operating limits: docs/tool-discovery.md.
+name: Weekly tool discovery
+
+on:
+  schedule:
+    - cron: '23 15 * * 1' # Monday 09:23 MDT / 08:23 MST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: weekly-tool-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Discover unreviewed candidates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/discover_tools.py --publish

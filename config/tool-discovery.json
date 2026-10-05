@@ -1,0 +1,17 @@
+{
+  "created_days": 180,
+  "pushed_days": 90,
+  "min_stars": 20,
+  "per_query_limit": 20,
+  "max_candidates": 5,
+  "ignore": [],
+  "queries": [
+    {"topic": "Agent skills", "query": "topic:agent-skills"},
+    {"topic": "MCP integrations", "query": "topic:mcp"},
+    {"topic": "Developer tools", "query": "topic:developer-tools"},
+    {"topic": "AI retrieval", "query": "topic:rag"},
+    {"topic": "Browser automation", "query": "topic:browser-automation"},
+    {"topic": "Game modding", "query": "topic:modding"},
+    {"topic": "Creative AI", "query": "topic:generative-ai"}
+  ]
+}
