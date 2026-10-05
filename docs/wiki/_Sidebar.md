@@ -1,6 +1,6 @@
 - [Home](Home.md)
 - [Getting started](Getting-Started.md)
-- [All 60 tools](Tool-Catalog.md)
+- [Tool catalog](Tool-Catalog.md)
 - [Retrieval system](Retrieval-System.md)
 - [Codex and OpenCode](Codex-and-OpenCode.md)
 - [Runtime setup](Runtime-Setup.md)
