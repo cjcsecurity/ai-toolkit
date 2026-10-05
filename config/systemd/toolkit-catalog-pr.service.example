@@ -1,0 +1,11 @@
+[Unit]
+Description=Open PRs for reviewed AI Toolkit catalog additions
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 %h/.local/lib/ai-toolkit-automation/catalog_pr.py --source SOURCE --repository OWNER/REPO --gitleaks GITLEAKS --publish
+TimeoutStartSec=15min
+UMask=0077
+NoNewPrivileges=true

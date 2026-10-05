@@ -1,0 +1,11 @@
+[Unit]
+Description=Check daily for unpublished AI Toolkit catalog additions
+
+[Timer]
+OnCalendar=*-*-* 09:17:00 America/Denver
+RandomizedDelaySec=5min
+Persistent=true
+Unit=toolkit-catalog-pr.service
+
+[Install]
+WantedBy=timers.target

@@ -17,6 +17,8 @@ python3 scripts/generate_catalog_docs.py
 python3 scripts/generate_catalog_docs.py --check
 ```
 
+Maintainers can enable [catalog maintenance automation](docs/catalog-automation.md) to open PRs for completed local additions and discover new candidates weekly. Discovery produces a review queue; choosing and reviewing a tool remains deliberate.
+
 ## Manager changes
 
 Keep the lexical path usable with Python 3.11+ and the standard library. Optional search and MCP dependencies should stay isolated and explicit. Query operations must not silently download models or contact an embedding API. Preserve source locations, bounded output, and useful error messages.

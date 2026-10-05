@@ -46,3 +46,7 @@ Generated files are [`catalog.md`](../../catalog.md), [the catalog index](Tool-C
 Do not commit `repos/`, `runtime/`, `state/`, private browser profiles, local environment files, or machine-specific registration. Bootstrap and agent registration are explicit user actions. Upstream license files remain in each cloned repository; the manager's MIT license does not relicense those tools.
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution expectations.
+
+## Scheduled maintenance
+
+[Catalog maintenance automation](../catalog-automation.md) can open PRs for completed local additions daily and produce a weekly shortlist of new candidates. The local publisher validates one new entry at a time without changing the active checkout. Discovery leaves candidates outside the reviewed catalog, and neither workflow merges PRs.
