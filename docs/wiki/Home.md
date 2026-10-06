@@ -7,7 +7,7 @@ AI Toolkit makes a growing personal collection of reviewed open-source tools sea
 | [Getting started](Getting-Started.md) | Small lexical install, full semantic install, and first searches |
 | [Tool catalog](Tool-Catalog.md) | Categories and a detailed page for every catalog entry |
 | [Retrieval system](Retrieval-System.md) | Corpus, local embeddings, lexical search, scoring, and limits |
-| [Codex and OpenCode](Codex-and-OpenCode.md) | Explicit client registration and on-demand skills |
+| [Coding agents](Agent-Integration.md) | Explicit client registration and on-demand skills |
 | [Recommendations and MCP](../rag.md) | Cited evidence bundles, source verification, host setup, and evaluation |
 | [Runtime setup](Runtime-Setup.md) | Separate source retrieval from application and MCP setup |
 | [Maintenance](Maintenance.md) | Pins, updates, regeneration, indexing, and checks |
