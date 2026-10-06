@@ -22,7 +22,7 @@ Scope recommendations describe how to adopt this tool if selected. They do not m
 
 ## Requirements and dependencies
 
-- Python 3.10+, FFmpeg, Node.js 18+ and an AI coding assistant; make setup installs Python dependencies, Remotion dependencies and attempts Piper TTS and HyperFrames setup.
+- Python 3.10+, FFmpeg, Node.js 18+ for the base setup and an AI coding assistant; the HyperFrames renderer requires Node.js 22+. make setup installs Python dependencies, Remotion dependencies and attempts Piper TTS and HyperFrames setup.
 - Pipeline requirements vary: cloud image/video/voice providers need their own credentials and may incur charges; offline/local alternatives require suitable models and runtime resources.
 - Optional GPU workflows need compatible NVIDIA hardware and additional dependencies. Provider availability and quality checks must be confirmed per production.
 - AGPL-3.0 project license; bundled skills, dependencies and generated media have their own applicable terms.
