@@ -12315,7 +12315,7 @@
       "kind": "cli + mcp + skill",
       "rationale": "Inspect application behavior and recover cited implementation evidence with local analysis providers; decompilation yields pseudocode, not original source.",
       "requirements": [
-        "Node.js 22.19+ or 24.11+ and npm; supported hosts are macOS 12+, Ubuntu 24.04+, Fedora 41+ and 64-bit Arch Linux. Windows operations remain unavailable at this revision.",
+        "Node.js ^22.19.0 || ^24.11.0 || >=26.0.0 and npm; supported hosts are macOS 12+, Ubuntu 24.04+, Fedora 41+ and 64-bit Arch Linux. Windows operations remain unavailable at this revision.",
         "Native analysis requires separately installed Hopper (separate vendor license/demo limits) or Ghidra 12.1.4 with a 64-bit JDK 21; Ghidra supports Linux x64 and macOS x64/arm64.",
         "Linux Hopper demo sessions require Python 3, Xvfb, X11 and XTEST; setup may request system package installation.",
         "REA is MIT-licensed; analysis-provider licenses and target authorization are separate."
