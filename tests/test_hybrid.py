@@ -49,6 +49,65 @@ class HybridTests(unittest.TestCase):
         rows, _ = hybrid.retrieve(self.db, 'checkpoints', self.root, lexical_only=True)
         self.assertEqual(len(rows), 2)
 
+    def test_repository_discovery_uses_chunks_without_counting_duplicate_votes(self):
+        summaries = [dict(self.records[0], uid=rid + '-summary', repo_id=rid, kind='repo',
+                          name='demo/' + rid, path='', text='General utilities')
+                     for rid in ('platform', 'other')]
+        hybrid.populate(self.db, [*summaries, *self.records])
+        before, _ = hybrid.retrieve(self.db, 'checkpoints', self.root, kinds=['repo'], lexical_only=True)
+        self.assertEqual({r['repo_id'] for r in before}, {'platform', 'other'})
+        self.assertTrue(all(r['kind'] == 'repo' and r['matches'] for r in before))
+        copies = [dict(self.records[0], uid=f'copy-{i}', path=f'copies/{i}.md') for i in range(120)]
+        hybrid.populate(self.db, [*summaries, *self.records, *copies])
+        after, _ = hybrid.retrieve(self.db, 'checkpoints', self.root, kinds=['repo'], lexical_only=True)
+        self.assertEqual([(r['repo_id'], r['score']) for r in before],
+                         [(r['repo_id'], r['score']) for r in after])
+        filtered, _ = hybrid.retrieve(self.db, 'checkpoints', self.root, kinds=['repo'],
+                                      repo_id='other', lexical_only=True)
+        self.assertEqual([r['repo_id'] for r in filtered], ['other'])
+        self.assertEqual(filtered[0]['matches'][0]['path'], 'docs/checkpoint.md')
+
+    @unittest.skipUnless(HAS_NUMPY, 'optional NumPy dependency missing')
+    def test_repository_vector_discovery_finds_capability_without_keyword_overlap(self):
+        import numpy as np
+        summary = dict(self.records[0], uid='summary', kind='repo', name='demo/platform',
+                       path='', text='General utilities')
+        hybrid.populate(self.db, [summary, *self.records])
+        class Embedder:
+            fingerprint = 'discovery-v1'
+            def embed_query(self, text):
+                return np.array([1, 0], dtype=np.float32)
+        self.db.execute('INSERT INTO metadata VALUES (?,?)', ('embedding_fingerprint', 'discovery-v1'))
+        self.db.executemany('INSERT INTO unit_vectors VALUES (?,?)', [
+            (uid, np.array(vector, dtype=np.float32).tobytes())
+            for uid, vector in [('summary', [0, 1]), ('checkpoint', [1, 0]), ('colors', [0, 1])]])
+        rows, mode = hybrid.retrieve(self.db, 'resume where it stopped', self.root,
+                                    kinds=['repo'], embedder=Embedder())
+        self.assertEqual(mode, 'hybrid')
+        self.assertEqual([r['repo_id'] for r in rows], ['platform'])
+        self.assertIsNone(rows[0]['lexical_rank'])
+        self.assertEqual(rows[0]['matches'][0]['uid'], 'checkpoint')
+
+    @unittest.skipUnless(HAS_NUMPY, 'optional NumPy dependency missing')
+    def test_repository_channels_retain_their_own_winning_passage(self):
+        import numpy as np
+        summary = dict(self.records[0], uid='summary', kind='repo', name='demo/platform',
+                       path='', text='General utilities')
+        hybrid.populate(self.db, [summary, *self.records])
+        class Embedder:
+            fingerprint = 'two-passages'
+            def embed_query(self, text):
+                return np.array([1, 0], dtype=np.float32)
+        self.db.execute('INSERT INTO metadata VALUES (?,?)', ('embedding_fingerprint', 'two-passages'))
+        self.db.executemany('INSERT INTO unit_vectors VALUES (?,?)', [
+            (uid, np.array(vector, dtype=np.float32).tobytes())
+            for uid, vector in [('summary', [0, 1]), ('checkpoint', [1, 0]), ('colors', [0, 1])]])
+        rows, _ = hybrid.retrieve(self.db, 'colors', self.root, kinds=['repo'], embedder=Embedder())
+        self.assertEqual(len(rows), 1)
+        self.assertEqual({r['uid'] for r in rows[0]['matches']}, {'colors', 'checkpoint'})
+        self.assertEqual((rows[0]['lexical_rank'], rows[0]['semantic_rank']), (1, 1))
+
+
     @unittest.skipUnless(HAS_NUMPY, 'optional NumPy dependency missing; install requirements-search.txt')
     def test_cached_vectors_are_reused_and_changed_content_is_reembedded(self):
         import numpy as np

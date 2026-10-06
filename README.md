@@ -86,7 +86,7 @@ flowchart LR
     E --> F[Configure and use the tool]
 ```
 
-Repository search gives each system a comparison candidate, so a large skill collection cannot occupy every slot. After choosing a shortlist, search within it and read the complete relevant skill or guide.
+Repository search matches summaries and internal skill/documentation chunks, then returns one candidate per project with its matching source passages. A large skill collection cannot occupy every slot. After choosing a shortlist, search within it and read the complete relevant skill or guide.
 
 ```bash
 bin/toolkit search "browser automation" --kind repo --limit 8

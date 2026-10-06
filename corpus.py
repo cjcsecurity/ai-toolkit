@@ -117,7 +117,7 @@ def _priority(path, declared):
             not path.startswith('skills/'), len(parts), len(path), path)
 
 
-def _sections(text, start=0):
+def _sections(text, start=0, *, pack=True):
     """Heading boundaries outside code fences, with exact character offsets."""
     boundaries = [(start, '')]
     position = 0
@@ -145,7 +145,7 @@ def _sections(text, start=0):
     pending = None
     for n, (offset, heading) in enumerate(boundaries):
         end = boundaries[n + 1][0] if n + 1 < len(boundaries) else len(text)
-        if (pending is not None and len(text) > CHUNK_SIZE
+        if (pack and pending is not None and len(text) > CHUNK_SIZE
                 and end - pending[0] <= CHUNK_SIZE):
             pending = (pending[0], end, ' / '.join(filter(None, [pending[2], heading])))
         else:
@@ -189,6 +189,46 @@ def _digest(value):
     return hashlib.sha256(value.encode('utf-8')).hexdigest()
 
 
+def _reference_chunks(text, start, end, heading):
+    """Keep linked list entries and table rows intact, with their category context."""
+    lines = text[start:end].splitlines(keepends=True)
+    entries = []
+    position, fence, header = start, None, ''
+    for i, line in enumerate(lines):
+        mark = re.match(r'\s*(`{3,}|~{3,})', line)
+        if mark:
+            marker = mark.group(1)
+            if fence is None:
+                fence = marker
+            elif marker[0] == fence[0] and len(marker) >= len(fence):
+                fence = None
+        elif fence is None:
+            bullet = re.match(r'^( *)(?:[-+*]|\d+\.)\s+\[([^\]]+)\]\(https?://', line)
+            table = re.match(r'^\s*\|\s*\[([^\]]+)\]\(https?://', line)
+            if bullet:
+                entries.append((position, None, bullet.group(2), '', len(bullet.group(1))))
+            elif table:
+                entries.append((position, position + len(line), table.group(1), header, None))
+            elif '|' in line and i + 1 < len(lines) and re.fullmatch(
+                    r'\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*', lines[i + 1]):
+                header = line.strip()
+        position += len(line)
+    # Nested bullets belong to their parent service, including cloud-provider limits.
+    # A later unindented sibling must not hide earlier entries (common in catalogs).
+    indent = next((e[4] for e in entries if e[4] is not None), 0)
+    entries = [e for e in entries if e[4] is None or e[4] <= indent]
+    cursor = start
+    for i, (left, right, label, context, _) in enumerate(entries):
+        for a, b in _chunks(text, cursor, left):
+            yield a, b, heading, ''
+        right = right or (entries[i + 1][0] if i + 1 < len(entries) else end)
+        for a, b in _chunks(text, left, right):
+            yield a, b, ' / '.join(filter(None, [heading, label])), context
+        cursor = right
+    for a, b in _chunks(text, cursor, end):
+        yield a, b, heading, ''
+
+
 def embedding_text(record):
     """Keep identity and complete source text; skill overviews may exceed 2000 chars."""
     prefix = f"{record.get('repo', record['repo_id'])}: {record['name']}"
@@ -228,6 +268,7 @@ def build_records(library):
             if not text.strip():
                 continue
             is_skill = relative in declared or Path(relative).name.lower() == 'skill.md'
+            reference = row.get('kind') == 'reference' and not is_skill
             kind = 'skill' if is_skill else 'doc'
             metadata, body_start = skill_metadata(text) if is_skill else ({}, 0)
             name = metadata.get('name') or Path(relative).parent.name
@@ -259,13 +300,15 @@ def build_records(library):
                 file_records.append(skill_overview)
             if not text[body_start:].strip():
                 body_start = 0
-            for section_start, section_end, heading in _sections(text, body_start):
-                for left, right in _chunks(text, section_start, section_end):
+            for section_start, section_end, heading in _sections(text, body_start, pack=not reference):
+                chunks = (_reference_chunks(text, section_start, section_end, heading) if reference else
+                          ((a, b, heading, '') for a, b in _chunks(text, section_start, section_end)))
+                for left, right, chunk_name, context in chunks:
                     chunk = text[left:right]
                     # Skill identity stays attached even when two skills share
                     # boilerplate. Doc duplicates don't need separate vectors.
                     content_hash = _digest(chunk)
-                    dedup_key = (kind, name if is_skill else '', content_hash)
+                    dedup_key = (kind, name if is_skill else chunk_name if reference else '', content_hash)
                     if dedup_key in seen_chunks:
                         existing = seen_chunks[dedup_key]
                         if relative != existing['path'] and relative not in existing['aliases']:
@@ -274,12 +317,14 @@ def build_records(library):
                         continue
                     record = dict(uid=_digest(f'{repo_id}:{kind}:{relative}:{left}:{right}'),
                                   repo_id=repo_id, repo=row.get('repo', repo_id), kind=kind,
-                                  name=name if is_skill else (heading or Path(relative).stem),
+                                  name=name if is_skill else (chunk_name or Path(relative).stem),
                                   path=relative, start_line=bisect_right(line_starts, left),
                                   end_line=bisect_right(line_starts, right - 1), text=chunk,
                                   content_hash=content_hash, aliases=[])
                     if is_skill:
                         record['description'] = metadata.get('description', '')
+                    elif context:
+                        record['description'] = context
                     records.append(record)
                     file_records.append(record)
                     seen_chunks[dedup_key] = record

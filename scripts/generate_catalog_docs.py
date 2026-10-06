@@ -27,7 +27,7 @@ CATEGORIES = {
     'Browsers, research, and web data': [
         'agent-reach', 'autocli', 'browser-harness', 'chrome-devtools-mcp',
         'cloakbrowser', 'crucix', 'firecrawl', 'opencli', 'playwright',
-        'public-apis', 'scrapling', 'moli',
+        'public-apis', 'free-for-dev', 'scrapling', 'moli',
     ],
     'Security and assessment': [
         'agentic-bug-hunter', 'anthropic-cybersecurity-skills', 'cyberstrike',

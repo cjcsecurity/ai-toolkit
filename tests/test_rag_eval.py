@@ -40,6 +40,8 @@ class EvaluationTests(unittest.TestCase):
                 {'id': 'nested', 'split': 'development', 'task': 'search', 'query': 'checkpoints',
                  'expected': [{'repo_id': 'platform', 'names': ['durable-execution'], 'path_prefixes': []}]},
                 {'id': 'negative', 'split': 'holdout', 'task': 'search', 'query': 'zzunfindable', 'expected': []},
+                {'id': 'repository', 'split': 'development', 'task': 'discover', 'query': 'persist',
+                 'expected': [{'repo_id': 'platform'}]},
             ]}))
             output = root/'report.json'
             proc = subprocess.run([sys.executable, str(ROOT/'evals/run.py'), '--root', str(root),
@@ -51,6 +53,9 @@ class EvaluationTests(unittest.TestCase):
             # The repository overview occupies rank 1 in unfiltered search.
             self.assertEqual(hybrid['cases'][0]['rank'], 2)
             self.assertIsNone(hybrid['cases'][1]['rank'])
+            self.assertEqual(hybrid['cases'][2]['rank'], 1)
+            self.assertTrue(hybrid['cases'][2]['references_valid'])
+            self.assertIn('verified', hybrid['cases'][2]['provenance_statuses'])
             self.assertEqual(hybrid['summary']['development/search']['cases'], 1)
             self.assertNotIn('holdout/search', hybrid['summary'])
             self.assertEqual(len(report['dataset_sha256']), 64)

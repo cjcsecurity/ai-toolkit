@@ -1,6 +1,6 @@
 # Tool catalog
 
-**68 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**69 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -50,6 +50,7 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [opencli](tools/opencli.md) | cli | 6 | TypeScript CLI with website/Electron adapters and browser primitives using a Chrome extension and local bridge daemon. |
 | [playwright](tools/playwright.md) | framework | 3 | Browser automation and end-to-end tests across Chromium, Firefox and WebKit, with locators, web-first assertions, screenshots, network mocking, tracing and production CLI/trace/component-testing skills. |
 | [public-apis](tools/public-apis.md) | reference | 0 | Curated catalog of public APIs organized by topic, with descriptions and authentication, HTTPS, and CORS information. |
+| [free-for-dev](tools/free-for-dev.md) | reference | 0 | Find free hosting platforms for web apps, static websites and React/Vite projects. Compare free tiers for hosting, databases, authentication, storage, email, monitoring, CI/CD, APIs and cloud services. Community-maintained reference includes Cloudflare Pages, Netlify and Vercel; verify current official provider limits before choosing. |
 | [scrapling](tools/scrapling.md) | cli | 1 | Python HTML parser, HTTP/browser fetchers, adaptive selectors, spider framework, scraping CLI, and optional MCP server. |
 | [moli](tools/moli.md) | cli + skills | 3 | Rust headless browser for JavaScript-rendered page extraction, web search and automation through CLI, CDP and WebDriver, with optional layout and screenshots. |
 
