@@ -222,6 +222,10 @@ class Library:
                 lines=[r['start_line'], r['end_line']], excerpt=r['excerpt'][:650],
                 availability=entry['availability'], source_present=entry['source_present'], retrieval=mode,
                 lexical_rank=r['lexical_rank'], semantic_rank=r['semantic_rank']))
+            if 'matches' in r:
+                results[-1]['matches'] = [dict(kind=p['kind'], name=p['name'], path=p['path'],
+                    lines=[p['start_line'], p['end_line']], excerpt=p['text'][:650],
+                    context=p.get('description', '')[:500]) for p in r['matches']]
         return results
 
     def docs(self, name, query, limit=3, lexical_only=False):

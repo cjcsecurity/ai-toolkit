@@ -6,9 +6,10 @@ The toolkit searches reviewed repository summaries and locally available source 
 
 ```mermaid
 flowchart TD
-    M[Reviewed manifest] --> R[One summary candidate per repository]
+    M[Reviewed manifest] --> R[Repository summaries]
     S[Pinned local source] --> C[Skills and documentation sections]
-    R --> Q[Repository comparison: --kind repo]
+    R --> Q[Rank best matches and group by repository]
+    C --> Q
     Q --> P[Inspect requirements and choose a shortlist]
     P --> F[Capability search: --repo ID]
     C --> F
@@ -16,13 +17,15 @@ flowchart TD
     X --> D[Read the selected complete instructions]
 ```
 
-A repository query gives each registered system a comparison candidate. An unrestricted capability query can correctly return several matches from one large bundle; it is not a balanced comparison of systems. Repeated chunks of the same capability are deduplicated so a long manual cannot consume all result slots.
+A repository query (`--kind repo`) searches summaries, skills and documentation, then gives each project one result. Its best matching passage in each channel determines its rank; additional matching chunks do not add votes. Grouping happens before the candidate limit, so a long manual cannot consume all result slots. CLI results include `matches` with the specific capability, excerpt and source lines. RAG/MCP returns the same supporting passages as cited evidence. An unrestricted capability query can still return several matches from one bundle.
 
 ## Corpus and indexing
 
 [`corpus.py`](../../corpus.py) assembles repository summaries, registered production `SKILL.md` files, and selected documentation. It preserves source paths and line ranges. Missing repositories contribute catalog metadata but cannot contribute their source files.
 
 Documentation is divided into sections and passages with a target size of **1,800 characters**, with up to **150 characters of overlap**. This is a character budget, independent of model tokenization. Registered skill paths distinguish usable skills from fixtures, provider duplicates, and internal maintainer instructions where the catalog review identified them.
+
+For reference collections such as free-for-dev and public-apis, linked list entries and linked Markdown table rows become individual passages. Category headings and table column labels supply embedding context; nested limits stay with the parent service. Returned matches and RAG sources include column labels in a separate `context` field, leaving cited row text unchanged. Oversized entries use the normal passage splitter without dropping their tail. This is a focused Markdown heuristic, not a general service extractor; other formats retain section-based chunking. Source text and line citations remain exact. Rebuild with `toolkit index --semantic` after upgrading to this corpus version; unchanged vectors are reused.
 
 [`hybrid.py`](../../hybrid.py) stores the corpus in SQLite. Index rebuilding is separate from external application setup. Unchanged passage embeddings are reused from a local content-hash cache keyed by the embedding configuration; a changed model fingerprint requires compatible vectors.
 
@@ -48,7 +51,7 @@ Hybrid ranking uses reciprocal rank fusion:
 score = 1 / (20 + lexical_rank) + 1 / (20 + semantic_rank)
 ```
 
-A missing channel contributes zero. Skill candidates receive a **1.1 multiplier**; exact repository identifier/name matches receive an additional preference. These are discovery heuristics, not calibrated probabilities. Raw cosine similarity and the fused ranking score measure different things.
+A missing channel contributes zero. In repository discovery, each channel ranks unique projects by their strongest matching summary or passage, and fusion combines those project ranks. The best source passage from each channel is retained when they differ. Skill candidates in capability search receive a **1.1 multiplier**; exact repository identifier/name matches receive an additional preference. These are discovery heuristics, not calibrated probabilities. Raw cosine similarity and the fused ranking score measure different things.
 
 If compatible vectors or the local model are unavailable, normal search reports a lexical fallback. `toolkit search-status` distinguishes hybrid coverage from fallback. `toolkit index --semantic` requires a complete semantic build and reports a failure when the runtime cannot supply one.
 

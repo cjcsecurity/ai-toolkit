@@ -10423,6 +10423,60 @@
       "path": "repos/firecrawl--firecrawl"
     },
     {
+      "id": "free-for-dev",
+      "repo": "ripienaar/free-for-dev",
+      "url": "https://github.com/ripienaar/free-for-dev",
+      "commit": "4dbda5ecff8f86164338dd50bd59f9920752ad5c",
+      "description": "Find free hosting platforms for web apps, static websites and React/Vite projects. Compare free tiers for hosting, databases, authentication, storage, email, monitoring, CI/CD, APIs and cloud services. Community-maintained reference includes Cloudflare Pages, Netlify and Vercel; verify current official provider limits before choosing.",
+      "tags": [
+        "free platforms",
+        "free tier",
+        "hosting",
+        "databases",
+        "authentication",
+        "storage",
+        "email",
+        "monitoring",
+        "CI/CD",
+        "cloud",
+        "SaaS",
+        "PaaS",
+        "IaaS",
+        "reference",
+        "project planning"
+      ],
+      "kind": "reference",
+      "recommended_scope": "reference",
+      "rationale": "Use the existing local documentation search to shortlist free services for project requirements. This complements public-apis with hosted platforms and infrastructure; it is a discovery reference, not a guarantee of current pricing or suitability.",
+      "requirements": [
+        "No runtime, account or API key is needed to search the downloaded Markdown reference.",
+        "Using a selected provider may require registration, billing details, credentials and acceptance of its terms.",
+        "Verify current official pricing, quotas, overage charges, inactivity policies, region and commercial-use restrictions before recommending or provisioning a service. A pinned catalog snapshot is not live pricing."
+      ],
+      "entrypoints": [
+        "README.md",
+        "CONTRIBUTING.md"
+      ],
+      "skill_paths": [],
+      "install_commands": [],
+      "setup_scope": "reference only; no application installation",
+      "agent_setup": {
+        "action": "read-selected-reference",
+        "working_directory": "Read from the stored source checkout; configure selected services only in the target project.",
+        "read_first": [
+          "toolkit show free-for-dev",
+          "toolkit docs free-for-dev \"hosting\"",
+          "toolkit docs free-for-dev \"PostgreSQL\""
+        ],
+        "install": "None: use the toolkit source sync and existing search index. Do not install a crawler or launch the upstream website.",
+        "configure": "Search by required capability, inspect matching README passages and provider links, then compare free-tier limits against the project requirements.",
+        "verify": "Open each shortlisted provider's official documentation and pricing page. Separate ongoing free tiers from trials or credits, cite the current terms and verification date, and state any unknown limits.",
+        "record_result": "Record the chosen provider, relevant quotas and restrictions, official source links, verification date and remaining setup requirements in the target project.",
+        "source_revision": "4dbda5ecff8f86164338dd50bd59f9920752ad5c"
+      },
+      "path": "repos/ripienaar--free-for-dev"
+    },
+    {
       "id": "gh-aw",
       "repo": "github/gh-aw",
       "url": "https://github.com/github/gh-aw",

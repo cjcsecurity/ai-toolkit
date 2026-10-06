@@ -7,7 +7,7 @@ import sqlite3
 import sys
 from collections import Counter
 
-SCHEMA_VERSION = '2'
+SCHEMA_VERSION = '3'
 # Sharper decay preserves strong single-channel matches among weak shared hits.
 RRF_K = 20
 STOP = set('a an the i we you our your to for with and or of in on from use using need want tools tool project that can is are how do me my find something help please would like have has it its this which'.split())
@@ -113,17 +113,23 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
     params = []
     if repo_id:
         where.append('u.repo_id=?'); params.append(repo_id)
-    if kinds:
+    repository_search = kinds == ['repo']
+    if kinds and not repository_search:
         where.append('u.kind IN (' + ','.join('?' for _ in kinds) + ')'); params.extend(kinds)
     filters = (' AND ' + ' AND '.join(where)) if where else ''
     top = max(80, limit * 16)
-    identities = {r['uid']: (r['repo_id'], '' if max_per_repo and r['kind'] == 'skill' else r['path'], r['name']) for r in
-                  conn.execute('SELECT uid,repo_id,path,name,kind FROM units u WHERE 1=1' + filters, params)}
+    summaries = {r['repo_id']: dict(r) for r in conn.execute("SELECT * FROM units WHERE kind='repo'")} if repository_search else {}
+    identities = {r['uid']: ((r['repo_id'], '', '') if repository_search else
+                  (r['repo_id'], '' if max_per_repo and r['kind'] == 'skill' else r['path'], r['name'])) for r in
+                  conn.execute('SELECT uid,repo_id,path,name,kind FROM units u WHERE 1=1' + filters, params)
+                  if not repository_search or r['repo_id'] in summaries}
     # Rank capabilities, not chunks: a long manual must not consume the candidate pool.
     lex_ranks, snippets, representatives = {}, {}, {}
     lex_repos, dense_repos = Counter(), Counter()
     cursor = conn.execute("SELECT u.uid,snippet(unit_search,2,'','', ' … ',90) AS excerpt FROM unit_search JOIN units u ON u.uid=unit_search.uid WHERE unit_search MATCH ?" + filters + ' ORDER BY bm25(unit_search,0,4,1)', [q, *params])
     for row in cursor:
+        if row[0] not in identities:
+            continue
         key = identities[row[0]]
         if key in lex_ranks or (max_per_repo and lex_repos[key[0]] >= max_per_repo):
             continue
@@ -134,7 +140,7 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
         if len(lex_ranks) >= top:
             break
     cursor.close()
-    dense_ranks, similarities = {}, {}
+    dense_ranks, similarities, dense_representatives = {}, {}, {}
     mode = 'lexical' if lexical_only else 'lexical-fallback'
     if not lexical_only:
         recorded = conn.execute("SELECT value FROM metadata WHERE key='embedding_fingerprint'").fetchone()
@@ -156,18 +162,21 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
                         if float(scores[position]) < 0.25:
                             continue
                         uid = rows[position][0]
+                        if uid not in identities:
+                            continue
                         key = identities[uid]
                         if key in dense_ranks or (max_per_repo and dense_repos[key[0]] >= max_per_repo):
                             continue
                         dense_ranks[key] = len(dense_ranks) + 1
                         dense_repos[key[0]] += 1
                         similarities[key] = float(scores[position])
+                        dense_representatives[key] = uid
                         representatives.setdefault(key, uid)
                         if len(dense_ranks) >= top:
                             break
                 mode = 'hybrid'
             except (ImportError, RuntimeError, FileNotFoundError, ValueError) as exc:
-                dense_ranks, similarities = {}, {}
+                dense_ranks, similarities, dense_representatives = {}, {}, {}
                 print(f'Semantic search unavailable; using lexical search: {exc}', file=sys.stderr)
     ids = set(lex_ranks) | set(dense_ranks)
     if not ids:
@@ -180,11 +189,25 @@ def retrieve(conn, query, root, limit=5, repo_id=None, kinds=None, lexical_only=
         record = dict(row)
         lr, sr = lex_ranks.get(key), dense_ranks.get(key)
         score = (1 / (RRF_K + lr) if lr else 0) + (1 / (RRF_K + sr) if sr else 0)
+        if repository_search:
+            # Each repository gets its best rank per channel, never votes per chunk.
+            # Retain both winning passages when the channels found different evidence.
+            winners = [(lr, representatives[key])] if lr else []
+            if sr:
+                winners.append((sr, dense_representatives[key]))
+            passages = {}
+            for _, winner in sorted(winners, key=lambda item: item[0]):
+                passage = dict(conn.execute('SELECT * FROM units WHERE uid=?', (winner,)).fetchone())
+                if passage['kind'] != 'repo':
+                    passages.setdefault(winner, passage)
+            record = dict(summaries[key[0]], matches=list(passages.values()))
         if record['kind'] == 'skill':
             score *= 1.1
         if exact in (record['name'].lower(), record['repo_id'].lower()) and (record['kind'] != 'doc'):
             score += 1
         excerpt = snippets.get(key, record['text'][:650])
+        if repository_search and record['matches']:
+            excerpt = record['matches'][0]['text'][:650]
         description = record.get('description', '')
         if description and excerpt.startswith(description):
             excerpt = excerpt[len(description):].lstrip() or record['text'][:650]

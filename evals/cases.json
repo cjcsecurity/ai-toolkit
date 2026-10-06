@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "label_notes": "Historical development capability labels preserved. Six new repository-selection cases and two unsupported-query observations frozen before running the extension evaluation. Expected lists are partial relevance judgements, not exhaustive ground truth.",
+  "label_notes": "Historical development capability labels preserved. Six new repository-selection cases and two unsupported-query observations frozen before running the extension evaluation. Expected lists are partial relevance judgements, not exhaustive ground truth. Collection-discovery development cases are known user requests, not unseen holdout queries.",
   "cases": [
     {
       "id": "quiet_editorial_ui",
@@ -308,6 +308,50 @@
       "task": "search",
       "query": "telepathic marmalade choreography for purple moon hamsters",
       "expected": []
+    },
+    {
+      "id": "free_hosting",
+      "split": "development",
+      "task": "discover",
+      "query": "host my web app for free",
+      "expected": [
+        {
+          "repo_id": "free-for-dev"
+        }
+      ]
+    },
+    {
+      "id": "static_hosting",
+      "split": "development",
+      "task": "discover",
+      "query": "host static React Vite web app for free",
+      "expected": [
+        {
+          "repo_id": "free-for-dev"
+        }
+      ]
+    },
+    {
+      "id": "weather_api",
+      "split": "development",
+      "task": "discover",
+      "query": "get historical weather data through an API",
+      "expected": [
+        {
+          "repo_id": "public-apis"
+        }
+      ]
+    },
+    {
+      "id": "free_database",
+      "split": "development",
+      "task": "discover",
+      "query": "free PostgreSQL database for my project",
+      "expected": [
+        {
+          "repo_id": "free-for-dev"
+        }
+      ]
     }
   ]
 }

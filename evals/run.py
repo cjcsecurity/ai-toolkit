@@ -49,7 +49,7 @@ def metrics(ranks):
 def matches(row, expected, task):
     # Preserve the historical capability matcher's named/path-prefix semantics.
     return any(row['id'] == e['repo_id'] and (
-        task == 'recommend' or (row.get('kind') != 'repo' and (
+        task in ('recommend', 'discover') or (row.get('kind') != 'repo' and (
             row.get('name') in e.get('names', []) or
             any(row.get('path', '').startswith(p) for p in e.get('path_prefixes', [])))))
         for e in expected)
@@ -90,7 +90,9 @@ def evaluate(root, cases_path, *, limit=5, split='all', task='all'):
                                             limit=limit, lexical_only=mode == 'lexical', budget=64000)
                 rows = payload['candidates']
             else:
-                payload = service.search(case['query'], limit=limit, lexical_only=mode == 'lexical', budget=64000)
+                payload = service.search(case['query'], limit=limit,
+                                         kind='repo' if case['task'] == 'discover' else None,
+                                         lexical_only=mode == 'lexical', budget=64000)
                 rows = payload['results']
             elapsed = time.perf_counter() - started
             durations.append(elapsed)
@@ -127,7 +129,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--limit', type=int, default=5)
     parser.add_argument('--split', choices=['all', 'development', 'holdout'], default='all')
-    parser.add_argument('--task', choices=['all', 'search', 'recommend'], default='all')
+    parser.add_argument('--task', choices=['all', 'search', 'recommend', 'discover'], default='all')
     args = parser.parse_args()
     report = evaluate(args.root, args.cases, limit=args.limit, split=args.split, task=args.task)
     write_report(args.output, report)

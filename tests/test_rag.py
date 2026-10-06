@@ -30,6 +30,39 @@ class RagTests(unittest.TestCase):
         capabilities = [s for s in result['sources'] if s['source_id'] in platform['evidence'] and s['kind'] == 'skill']
         self.assertEqual(len([s for s in capabilities if s['name'] == 'durable-execution']), 1)
 
+    def test_repository_discovery_returns_verified_capability_evidence_across_interfaces(self):
+        query = 'persist'
+        cli = self.library.search(query, kinds=['repo'], lexical_only=True)
+        self.assertEqual(cli[0]['id'], 'platform')
+        self.assertEqual(cli[0]['matches'][0]['path'], 'skills/main/SKILL.md')
+        result = self.service.search(query, kind='repo', lexical_only=True, budget=16000)
+        self.assertEqual([r['id'] for r in result['results']], [r['id'] for r in cli])
+        self.assertTrue(all(r['kind'] == 'repo' for r in result['results']))
+        candidate = result['results'][0]
+        passage = next(s for s in result['sources'] if s['kind'] == 'skill')
+        self.assertIn(passage['source_id'], candidate['evidence'])
+        self.assertEqual(passage['provenance']['status'], 'verified')
+        self.assertIn('Persist checkpoints', passage['text'])
+        recommended = self.service.recommend(query, lexical_only=True, budget=16000)
+        self.assertEqual([c['id'] for c in recommended['candidates']], [r['id'] for r in cli])
+
+    def test_reference_table_evidence_exposes_column_labels_without_changing_source_text(self):
+        path = self.root / 'repos/recovery/README.md'
+        header = 'API | Description | Auth | HTTPS | CORS |'
+        row = '| [Climate](https://climate.example) | Historical rainfall | No | Yes | No |'
+        path.write_text('## Weather\n' + header + '\n|---|---|---|---|---|\n' + row + '\n')
+        manifest = json.loads(self.library.manifest.read_text())
+        next(e for e in manifest['tools'] if e['id'] == 'recovery')['kind'] = 'reference'
+        self.library.manifest.write_text(json.dumps(manifest))
+        self.library.index(lexical=True)
+        cli = self.library.search('rainfall', kinds=['repo'], lexical_only=True)
+        self.assertEqual(cli[0]['matches'][0]['context'], header)
+        result = self.service.search('rainfall', kind='repo', lexical_only=True, budget=16000)
+        source = next(s for s in result['sources'] if s['kind'] == 'doc')
+        self.assertEqual(source['context'], header)
+        self.assertEqual(source['text'], row)
+        self.assertEqual(source['lines'], [4, 4])
+
     def test_service_expands_tilde_root_before_resolving(self):
         root = '~/' + os.path.relpath(self.root, Path.home())
         service = RagService(root)
@@ -313,6 +346,9 @@ class RagPortabilityTests(unittest.TestCase):
             self.assertTrue(all(r['availability'] == 'source-only' for r in result['results']))
             catalog = service.search('checkpoints', kind='repo', lexical_only=True, budget=16000)
             for source in catalog['sources']:
+                if source['kind'] != 'repo':
+                    self.assertEqual(source['provenance']['status'], 'verified')
+                    continue
                 evidence = json.loads(source['text'])
                 raw = json.loads((root/'manifest.json').read_text())['tools']
                 entry = next(e for e in raw if e['id'] == source['repo_id'])

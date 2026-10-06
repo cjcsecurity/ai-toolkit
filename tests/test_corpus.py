@@ -91,6 +91,53 @@ class CorpusTests(unittest.TestCase):
         self.assertEqual(match['start_line'], 4)
         self.assertEqual(match['text'], '\n'.join(source.splitlines()[match['start_line']-1:match['end_line']]).strip())
 
+    def test_reference_entries_keep_service_details_category_and_exact_source_spans(self):
+        self.row['kind'] = 'reference'
+        source = ('# Directory\n## Hosting\n'
+                  '  * [Harbor](https://harbor.example) - Free static sites.\n'
+                  '    Includes custom domains and 5 GB storage.\n'
+                  '  * [Orchard](https://orchard.example) - Managed databases.\n'
+                  '* [Unindented](https://unindented.example) - Another host.\n'
+                  '## Weather\n'
+                  'API | Description | Auth | HTTPS | CORS |\n'
+                  '|---|---|---|---|---|\n'
+                  '| [Climate](https://climate.example) | Historical rainfall | apiKey | Yes | No |\n'
+                  '| [Forecast](https://forecast.example) | Tomorrow\'s weather | No | Yes | Yes |\n')
+        self.write('README.md', source)
+        rows = [r for r in self.records() if r['kind'] == 'doc']
+        harbor = next(r for r in rows if '[Harbor]' in r['text'])
+        self.assertIn('5 GB storage', harbor['text'])
+        self.assertNotIn('Orchard', harbor['text'])
+        self.assertIn('Hosting', harbor['name'])
+        self.assertIn('Harbor', harbor['name'])
+        self.assertTrue(any(r['name'] == 'Hosting / Unindented' for r in rows))
+        climate = next(r for r in rows if '[Climate]' in r['text'])
+        self.assertNotIn('Forecast', climate['text'])
+        embedded = self.corpus.embedding_text(climate)
+        self.assertIn('Weather', embedded)
+        self.assertIn('HTTPS', embedded)
+        self.assertIn('apiKey', embedded)
+        for row in rows:
+            self.assertIn(row['text'], '\n'.join(source.splitlines()[row['start_line']-1:row['end_line']]))
+
+    def test_reference_chunking_keeps_nested_limits_and_long_entry_tail(self):
+        self.row['kind'] = 'reference'
+        source = ('## Cloud\n* [Cloud](https://cloud.example)\n'
+                  '  * [Compute](https://cloud.example/compute) - 20 hours.\n'
+                  '  * [Storage](https://cloud.example/storage) - 10 GB.\n'
+                  '* [Long](https://long.example) - ' + 'Details. ' * 400 + 'TAIL_LIMIT\n'
+                  '## Example\n```md\n* [Not a service](https://example.invalid)\n```\n')
+        self.write('README.md', source)
+        rows = [r for r in self.records() if r['kind'] == 'doc']
+        cloud = next(r for r in rows if '[Cloud]' in r['text'])
+        self.assertIn('20 hours', cloud['text'])
+        self.assertIn('10 GB', cloud['text'])
+        self.assertNotIn('[Long]', cloud['text'])
+        tail = next(r for r in rows if 'TAIL_LIMIT' in r['text'])
+        self.assertIn('Long', tail['name'])
+        self.assertFalse(any('Not a service' in r['name'] for r in rows))
+        self.assertTrue(all(len(self.corpus.embedding_text(r)) <= 2000 for r in rows))
+
     def test_fixtures_attacks_dependencies_builds_are_excluded(self):
         for folder in ('tests', '__fixtures__', 'attack_samples', 'malicious_skills', 'node_modules', 'dist', 'build', '.venv'):
             self.write(folder + '/SKILL.md', '---\nname: fake\n---\nUntrusted decoy capability.', True)

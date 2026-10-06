@@ -43,7 +43,9 @@ flowchart TD
 
 The pinned 384-dimensional MiniLM ONNX model, FastEmbed runtime, SQLite corpus and BM25/vector rank fusion are reused. Dense retrieval currently scores vectors with NumPy; there is no approximate nearest-neighbor database or external vector service.
 
-Recommendations search repository summaries and internal capabilities separately, then combine their best ranks. Per-repository limits and skill-name deduplication apply before candidate truncation, preventing provider copies from monopolizing the pool. Up to two capability passages and one catalog source accompany each repository. Use scoped search to investigate further capabilities within a selected repository.
+Repository discovery and recommendations share one retrieval path: search summaries and internal capabilities, keep each repository's best lexical and semantic ranks, then combine those ranks. Grouping occurs before candidate truncation, so repeated chunks add no extra votes. Up to two winning source passages accompany each catalog entry. `discovery_ranks` reports `lexical` and `semantic` project ranks; a missing channel is null. A missing source checkout can still match its catalog summary.
+
+Reference collections split linked service bullets and API table rows into individual passages, keeping category and column context for embeddings and exact text/lines for citations. Sources include a separate `context` field for extracted descriptions or table column labels. General documentation and skill chunking remain available for the other repository types.
 
 `rag.py` owns validation, model reuse, snapshot reads, recommendation assembly and output packing. `rag_sources.py` verifies attribution. `rag_server.py` uses the official MCP SDK 2.2.0 for protocol and schemas. A lock serializes service operations within each server process. Requests reopen the published index, and model files are revalidated when their file signatures change. Query inference remains local.
 

@@ -217,11 +217,12 @@ class RagService:
             for row in rows:
                 entry = entries[row['repo_id']]
                 source = sources.catalog(entry) if row['kind'] == 'repo' else sources.passage(row, entry)
-                payload['sources'].append(source)
+                evidence = [source, *[sources.passage(p, entry) for p in row.get('matches', [])]]
+                payload['sources'].extend(evidence)
                 payload['results'].append(dict(id=entry['id'], name=row['name'], kind=row['kind'],
                     path=source['path'], lines=source['lines'], availability=entry.get('availability', 'source-only'),
                     lexical_rank=row['lexical_rank'], semantic_rank=row['semantic_rank'],
-                    evidence=[source['source_id']]))
+                    evidence=[s['source_id'] for s in evidence]))
             return fit(payload, budget, 'results')
 
     def _project(self, project):
@@ -247,41 +248,22 @@ class RagService:
         with self._snapshot(lexical_only) as snapshot:
             # Constraints are carried to the generating agent. Negations such as "no Docker"
             # must not become a positive keyword boost for Docker in the retriever.
-            repos, retrieval = self._retrieve(snapshot, query, 20, kinds=['repo'], lexical_only=lexical_only)
-            capabilities, cap_retrieval = self._retrieve(snapshot, query, 60, kinds=['skill', 'doc'],
-                                                        lexical_only=lexical_only, max_per_repo=2)
-            if cap_retrieval['mode'] == 'lexical-fallback':
-                retrieval = cap_retrieval
+            repos, retrieval = self._retrieve(snapshot, query, limit, kinds=['repo'], lexical_only=lexical_only)
             entries = {e['id']: e for e in snapshot[1]}
-            groups = {}
-            for channel, rows in [('repository', repos), ('capability', capabilities)]:
-                seen = set()
-                for row in rows:
-                    rid = row['repo_id']
-                    group = groups.setdefault(rid, {'ranks': {}, 'passages': []})
-                    if rid not in seen:
-                        seen.add(rid)
-                        group['ranks'][channel] = len(seen)
-                    if channel == 'capability':
-                        key = (row['kind'], row['name'].casefold())
-                        if len(group['passages']) < 2 and not any((p['kind'], p['name'].casefold()) == key for p in group['passages']):
-                            group['passages'].append(row)
-            def score(item):
-                values = [1/(20+r) for r in item[1]['ranks'].values()]
-                return max(values) + (0.25*min(values) if len(values) > 1 else 0)
-            ordered = sorted(groups.items(), key=lambda item: (-score(item), item[0]))[:limit]
             sources = Sources(self.library, snapshot[1])
             payload = dict(schema_version=1, query=query, constraints=constraints, project=context,
                            retrieval=retrieval, index=self._identity(snapshot[2]), candidates=[], sources=[],
                            truncated=False, instructions=INSTRUCTIONS)
-            for rid, group in ordered:
+            for row in repos:
+                rid = row['repo_id']
                 entry = entries[rid]
-                evidence = [sources.catalog(entry), *[sources.passage(row, entry) for row in group['passages']]]
+                evidence = [sources.catalog(entry), *[sources.passage(p, entry) for p in row['matches']]]
                 payload['sources'].extend(evidence)
                 payload['candidates'].append(dict(id=rid, repo=entry['repo'],
                     description=entry.get('description', ''), availability=entry.get('availability', 'source-only'),
                     requirements=entry.get('requirements', []), selected=rid in context['selected_tools'],
-                    discovery_ranks=group['ranks'], evidence=[s['source_id'] for s in evidence],
+                    discovery_ranks={'lexical': row['lexical_rank'], 'semantic': row['semantic_rank']},
+                    evidence=[s['source_id'] for s in evidence],
                     next_step='get_tool for complete setup; read_tool_source for full selected skills'))
             return fit(payload, budget, 'candidates')
 

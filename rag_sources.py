@@ -72,6 +72,7 @@ class Sources:
         return dict(source_id='passage-' + digest(row['uid'] + row['text'])[:16],
                     repo_id=entry['id'], kind=row['kind'], name=row['name'], path=row['path'],
                     lines=[row['start_line'], row['end_line']], text=row['text'][:1200],
+                    context=row.get('description', '')[:500],
                     text_truncated=len(row['text']) > 1200, sha256=digest(row['text']), url=url,
                     provenance={'status': status, 'recorded_revision': recorded,
                                 'checkout_revision': head})
