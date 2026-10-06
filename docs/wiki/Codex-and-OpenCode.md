@@ -1,5 +1,7 @@
 # Codex and OpenCode
 
+For Claude Code, Gemini CLI, Cursor, Copilot, Windsurf, and generic agents, see the [coding-agent integration guide](Agent-Integration.md). Existing Codex/OpenCode setup is retained below.
+
 The toolkit's selector is a small discovery skill. It tells the agent to compare repository candidates, read requirements, retrieve relevant capabilities, and keep specialized collections on demand.
 
 After cloning and bootstrapping the toolkit, explicitly register either or both clients:
@@ -38,6 +40,6 @@ toolkit search "custom rules" --repo semgrep
 
 Some catalog entries recommend a broadly useful global CLI or skill. Those recommendations are metadata for a deliberate setup decision; registration installs only the toolkit selector and launchers. Full skill directories often contain references, scripts, agents, and assets, so preserve their layout when installing a selected skill later.
 
-[Superpowers](https://github.com/obra/superpowers) is a complementary engineering workflow that can be installed separately through its upstream instructions. It is not bundled, activated, or counted among the 60 catalog tools. The toolkit also works without it.
+[Superpowers](https://github.com/obra/superpowers) is a complementary engineering workflow that can be installed separately through its upstream instructions. It is not bundled or activated by the toolkit. The toolkit also works without it.
 
 See [runtime setup](Runtime-Setup.md) for optional one-shot MCP adapters and [security and privacy](Security-and-Privacy.md) for the boundary between retrieved text and agent authority.

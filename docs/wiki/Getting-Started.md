@@ -51,4 +51,4 @@ bin/toolkit --budget 30000 doctor
 
 `search-status` reports corpus/vector coverage and search mode. `doctor` checks local source presence and recorded revisions, not whether an external service or application works. Missing sources are expected after a selective install.
 
-Continue to [agent integration](Codex-and-OpenCode.md), [runtime setup](Runtime-Setup.md), or the [tool catalog](Tool-Catalog.md).
+Continue to [agent integration](Agent-Integration.md), [runtime setup](Runtime-Setup.md), or the [tool catalog](Tool-Catalog.md).

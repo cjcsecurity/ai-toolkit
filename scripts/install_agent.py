@@ -11,7 +11,24 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 START = b'<!-- BEGIN AI-TOOLKIT MANAGED -->'
 END = b'<!-- END AI-TOOLKIT MANAGED -->'
-CLIENTS = {'codex': '.codex/AGENTS.md', 'opencode': '.config/opencode/AGENTS.md'}
+CLIENTS = {
+    'codex': '.codex/AGENTS.md',
+    'opencode': '.config/opencode/AGENTS.md',
+    'claude': '.claude/CLAUDE.md',
+    'gemini': '.gemini/GEMINI.md',
+    'cursor': None,
+    'copilot': None,
+    'windsurf': None,
+    'generic': None,
+}
+# Each link points to the same canonical skill; client settings stay untouched.
+SKILL_DIRS = {
+    'claude': '.claude/skills',
+    'gemini': '.gemini/skills',
+    'cursor': '.cursor/skills',
+    'copilot': '.copilot/skills',
+    'windsurf': '.codeium/windsurf/skills',
+}
 
 
 def managed_block(root: Path) -> bytes:
@@ -72,15 +89,20 @@ def write_config(path: Path, content: bytes) -> None:
             os.unlink(name)
 
 
-def install(root: Path, home: Path, client: str) -> None:
+def install(root: Path, home: Path, client: str, *, dry_run: bool = False) -> None:
     root, home = root.resolve(), home.expanduser().resolve()
     if client not in {*CLIENTS, 'both'}:
         raise ValueError(f'Unknown client: {client}')
+    # Keep the original meaning of --client both, even as clients are added.
+    selected = ['codex', 'opencode'] if client == 'both' else [client]
     launcher = root / 'bin/toolkit'
     skill = root / 'skills/toolkit-selector'
     if not launcher.is_file() or not (skill / 'SKILL.md').is_file():
         raise ValueError('Checkout must contain bin/toolkit and skills/toolkit-selector/SKILL.md')
     links = {home / '.local/bin/toolkit': launcher, home / '.agents/skills/toolkit-selector': skill}
+    for name in selected:
+        if name in SKILL_DIRS:
+            links[home / SKILL_DIRS[name] / 'toolkit-selector'] = skill
     for name in ['toolkit-mcp', 'toolkit-serena', 'toolkit-chrome-mcp', 'toolkit-rag-mcp']:
         helper = root / 'bin' / name
         if helper.is_file():
@@ -90,7 +112,9 @@ def install(root: Path, home: Path, client: str) -> None:
         check_link(path, target)
     block = managed_block(root)
     configs = []
-    for name in CLIENTS if client == 'both' else [client]:
+    for name in selected:
+        if CLIENTS[name] is None:
+            continue
         path = home / CLIENTS[name]
         if path.is_symlink():
             raise ValueError(f'Refusing symlinked agent instructions at {path}; manage that file explicitly')
@@ -98,6 +122,13 @@ def install(root: Path, home: Path, client: str) -> None:
         new = updated_content(old, block)
         if new != old:
             configs.append((path, new))
+    if dry_run:
+        for path, target in links.items():
+            print(f'Link: {path} -> {target}')
+        for path, _ in configs:
+            print(f'Update managed instructions: {path}')
+        print('Dry run: no files changed. MCP registration is a separate step.')
+        return
     for path, target in links.items():
         if not path.is_symlink():
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -109,11 +140,13 @@ def install(root: Path, home: Path, client: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--client', choices=['codex', 'opencode', 'both'], required=True)
+    parser.add_argument('--client', choices=[*CLIENTS, 'both'], required=True,
+                        help='Agent to configure; both means Codex and OpenCode only')
     parser.add_argument('--home', type=Path, default=Path.home(), help='Home directory to configure (default: current user)')
+    parser.add_argument('--dry-run', action='store_true', help='Validate and preview destinations without writing files')
     args = parser.parse_args()
     try:
-        install(ROOT, args.home, args.client)
+        install(ROOT, args.home, args.client, dry_run=args.dry_run)
     except (ValueError, OSError) as error:
         parser.exit(1, f'Error: {error}\n')
     return 0

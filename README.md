@@ -11,7 +11,7 @@ I keep AI Toolkit as a curated collection of open-source tools and agent skills 
 
 The Python CLI searches repository summaries, individual skills, and documentation from local source copies. Compare candidates, check what they need to run, and retrieve the instructions that fit the task. The collection grows as I find and review useful tools; inclusion does not mean every tool is installed or used daily.
 
-Search runs locally: start with Python's standard library and SQLite, then add semantic retrieval when you need matches by meaning. Neither retrieval mode needs a model API key. The CLI and optional MCP server support **retrieval-augmented generation (RAG)** by assembling cited source evidence for your connected agent to use when generating a recommendation. Integrations are available for Codex and OpenCode.
+Search runs locally: start with Python's standard library and SQLite, then add semantic retrieval when you need matches by meaning. Neither retrieval mode needs a model API key. The CLI and optional MCP server support **retrieval-augmented generation (RAG)** by assembling cited source evidence for your connected agent to use when generating a recommendation. Use it with Claude Code, Codex, OpenCode, Gemini CLI, Cursor, Copilot, and Windsurf.
 
 [Quick start](#quick-start) · [See it in action](#see-it-in-action) · [Local RAG](#local-rag-for-coding-agents) · [Engineering](#engineering) · [Browse the library](#tool-catalog) · [Wiki](docs/wiki/Home.md) · [Contributing](CONTRIBUTING.md)
 
@@ -140,13 +140,13 @@ Only explicit setup downloads sources or models. Local retrieval does not make e
 ## Connect your agent
 
 ```bash
-python3 scripts/install_agent.py --client both
+python3 scripts/install_agent.py --client claude
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Registration installs the selector and command launchers for Codex and OpenCode. It preserves existing configuration and refuses conflicting destination files. Use `--client codex` or `--client opencode` to register one client. MCP adapters require [separate runtime setup](docs/wiki/Runtime-Setup.md).
+Choose `--client claude`, `codex`, `opencode`, `gemini`, `cursor`, `copilot`, or `windsurf`. Registration installs the shared selector and launchers, preserves existing configuration, and refuses conflicting destinations. Add `--dry-run` to preview changes. The original `--client both` still selects Codex and OpenCode. MCP adapters require [separate runtime setup](docs/wiki/Runtime-Setup.md).
 
-The selector teaches the agent to compare systems, retrieve relevant instructions, and reuse project choices. Specialized skills and MCP servers stay on demand. [Agent integration](docs/wiki/Codex-and-OpenCode.md) covers layout and scope. [Superpowers](https://github.com/obra/superpowers) is an optional complementary workflow, installed separately from the catalog.
+The selector teaches the agent to compare systems, retrieve relevant instructions, and reuse project choices. Specialized skills and MCP servers stay on demand. [Agent integration](docs/wiki/Agent-Integration.md) covers layout and scope. [Superpowers](https://github.com/obra/superpowers) is an optional complementary workflow, installed separately from the catalog.
 
 ## Tool catalog
 
@@ -270,7 +270,7 @@ These checks validate the manager, not every upstream application's runtime. See
 | [Wiki home](docs/wiki/Home.md) | Project overview and documentation map |
 | [Getting started](docs/wiki/Getting-Started.md) | Small lexical install, semantic setup, and first searches |
 | [Retrieval system](docs/wiki/Retrieval-System.md) | Corpus, embeddings, keyword ranking, and context budgets |
-| [Codex and OpenCode](docs/wiki/Codex-and-OpenCode.md) | Client registration and on-demand skills |
+| [Coding agents](docs/wiki/Agent-Integration.md) | Client registration and on-demand skills |
 | [Runtime setup](docs/wiki/Runtime-Setup.md) | Application dependencies and MCP adapters |
 | [Maintenance](docs/wiki/Maintenance.md) | Source pins, catalog generation, and indexing |
 | [Troubleshooting](docs/wiki/Troubleshooting.md) | Missing sources, fallback, and configuration conflicts |

@@ -4,7 +4,7 @@
 - [RAG recommendations](../rag.md)
 - [Agent demonstration](../rag-demo.md)
 - [Retrieval system](Retrieval-System.md)
-- [Codex and OpenCode](Codex-and-OpenCode.md)
+- [Coding agents](Agent-Integration.md)
 - [Runtime setup](Runtime-Setup.md)
 - [Maintenance](Maintenance.md)
 - [Troubleshooting](Troubleshooting.md)

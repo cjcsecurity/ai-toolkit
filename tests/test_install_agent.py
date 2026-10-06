@@ -3,6 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -91,6 +92,76 @@ class AgentInstallTests(unittest.TestCase):
                 self.assertEqual(conflict.read_text(), 'unrelated')
                 self.assertFalse((home / '.codex/AGENTS.md').exists())
                 self.assertFalse((home / '.config/opencode/AGENTS.md').exists())
+
+    def test_native_clients_discover_the_same_selector_without_replacing_settings(self):
+        from scripts.install_agent import install
+        cases = [
+            ('claude', '.claude/skills', '.claude/CLAUDE.md'),
+            ('gemini', '.gemini/skills', '.gemini/GEMINI.md'),
+            ('cursor', '.cursor/skills', None),
+            ('copilot', '.copilot/skills', None),
+            ('windsurf', '.codeium/windsurf/skills', None),
+            ('generic', '.agents/skills', None),
+        ]
+        for client, skills, instructions in cases:
+            with self.subTest(client=client):
+                home = self.home / client
+                settings = home / '.settings.json'
+                home.mkdir(parents=True)
+                settings.write_bytes(b'{"personal": true}\r\n')
+                if instructions:
+                    path = home / instructions
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(b'# My instructions\r\nKeep these bytes: \xff\n')
+                install(self.root, home, client)
+                self.assertEqual((home / skills / 'toolkit-selector/SKILL.md').read_text(), 'Portable selector\n')
+                self.assertEqual((home / skills / 'toolkit-selector').resolve(), self.root / 'skills/toolkit-selector')
+                if instructions:
+                    self.assertTrue(path.read_bytes().startswith(path.with_name(path.name + '.bak').read_bytes()))
+                snapshot = sorted(str(p.relative_to(home)) for p in home.rglob('*'))
+                install(self.root, home, client)
+                self.assertEqual(sorted(str(p.relative_to(home)) for p in home.rglob('*')), snapshot)
+                self.assertEqual(settings.read_bytes(), b'{"personal": true}\r\n')
+                self.assertFalse((home / '.codex').exists())
+                self.assertFalse((home / '.config/opencode').exists())
+
+    def test_native_skill_collision_prevents_launcher_and_instruction_writes(self):
+        from scripts.install_agent import install
+        conflict = self.home / '.claude/skills/toolkit-selector'
+        conflict.mkdir(parents=True)
+        (conflict / 'SKILL.md').write_text('My unrelated skill')
+        with self.assertRaisesRegex(ValueError, 'Refusing'):
+            install(self.root, self.home, 'claude')
+        self.assertEqual((conflict / 'SKILL.md').read_text(), 'My unrelated skill')
+        self.assertFalse((self.home / '.local').exists())
+        self.assertFalse((self.home / '.claude/CLAUDE.md').exists())
+
+    def test_claude_rejects_symlinked_or_malformed_instructions_before_writes(self):
+        from scripts.install_agent import install
+        path = self.home / '.claude/CLAUDE.md'
+        path.parent.mkdir(parents=True)
+        for content in [b'<!-- BEGIN AI-TOOLKIT MANAGED -->', b'<!-- END AI-TOOLKIT MANAGED -->\n<!-- BEGIN AI-TOOLKIT MANAGED -->']:
+            path.write_bytes(content)
+            with self.assertRaisesRegex(ValueError, 'Refusing'):
+                install(self.root, self.home, 'claude')
+            self.assertEqual(path.read_bytes(), content)
+            self.assertFalse((self.home / '.local').exists())
+        path.unlink()
+        path.symlink_to(self.root / 'personal.md')
+        with self.assertRaisesRegex(ValueError, 'symlinked'):
+            install(self.root, self.home, 'claude')
+        self.assertFalse((self.root / 'personal.md').exists())
+        self.assertFalse((self.home / '.local').exists())
+
+    def test_dry_run_prints_destinations_without_creating_home(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / 'scripts/install_agent.py'), '--client', 'claude',
+             '--home', str(self.home), '--dry-run'], capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('.claude/CLAUDE.md', result.stdout)
+        self.assertIn('.claude/skills/toolkit-selector', result.stdout)
+        self.assertFalse(self.home.exists())
 
 
 if __name__ == '__main__':
