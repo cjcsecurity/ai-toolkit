@@ -22,7 +22,7 @@ CATEGORIES = {
     ],
     'Design and interfaces': [
         'animate-ui', 'archify', 'awesome-claude-design', 'huashu-design',
-        'impeccable', 'open-design', 'taste-skill',
+        'impeccable', 'open-design', 'taste-skill', 'photocraft', 'text-to-cad',
     ],
     'Browsers, research, and web data': [
         'agent-reach', 'autocli', 'browser-harness', 'chrome-devtools-mcp',
@@ -41,7 +41,7 @@ CATEGORIES = {
     'Finance and markets': ['finance-skills', 'financial-services', 'openalice'],
     'Writing, video, and audio': [
         'brag', 'humanizer', 'hyperframes', 'hypit', 'pixelle-video',
-        'recordly', 'voicestudio',
+        'recordly', 'voicestudio', 'filmcraft', 'openmontage',
     ],
 
     'Games and modding': ['universal-modder'],
