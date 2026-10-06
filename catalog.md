@@ -1,6 +1,6 @@
 # Tool catalog
 
-**61 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**64 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -19,6 +19,8 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [open-code-review](docs/wiki/tools/open-code-review.md) | cli | 2 | Go-based code review CLI combining deterministic Git diff selection, file grouping and review rules with model-backed line-level findings, full-file scans and host-agent delegation without a separate OCR LLM endpoint. |
 | [ponytail](docs/wiki/tools/ponytail.md) | skill-bundle | 6 | Coding simplification skills for reuse-first implementation, over-engineering review, repository audits and deferred-shortcut tracking, with optional multi-agent-host plugins, lifecycle hooks and an MCP instruction server. |
 | [serena](docs/wiki/tools/serena.md) | mcp | 0 | MCP coding toolkit with language-server-backed symbol lookup, reference navigation, semantic editing, refactoring and project memories. |
+| [rea](docs/wiki/tools/rea.md) | cli + mcp + skill | 1 | CLI, MCP server and investigation skill for evidence-based analysis of native binaries, Electron/JavaScript applications, .NET assemblies and websites. |
+| [e2e](docs/wiki/tools/e2e.md) | framework + cli + skill | 1 | TypeScript end-to-end test runner combining natural-language agent actions with deterministic assertions for web and mobile applications. |
 
 ## Design and interfaces
 
@@ -47,6 +49,7 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [playwright](docs/wiki/tools/playwright.md) | framework | 3 | Browser automation and end-to-end tests across Chromium, Firefox and WebKit, with locators, web-first assertions, screenshots, network mocking, tracing and production CLI/trace/component-testing skills. |
 | [public-apis](docs/wiki/tools/public-apis.md) | reference | 0 | Curated catalog of public APIs organized by topic, with descriptions and authentication, HTTPS, and CORS information. |
 | [scrapling](docs/wiki/tools/scrapling.md) | cli | 1 | Python HTML parser, HTTP/browser fetchers, adaptive selectors, spider framework, scraping CLI, and optional MCP server. |
+| [moli](docs/wiki/tools/moli.md) | cli + skills | 3 | Rust headless browser for JavaScript-rendered page extraction, web search and automation through CLI, CDP and WebDriver, with optional layout and screenshots. |
 
 ## Security and assessment
 

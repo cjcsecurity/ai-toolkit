@@ -9666,6 +9666,59 @@
       "path": "repos/docling-project--docling"
     },
     {
+      "id": "e2e",
+      "repo": "tester-army/e2e",
+      "url": "https://github.com/tester-army/e2e",
+      "commit": "fd3a0c766b4d40c74fabdbc578e3832d80553bf9",
+      "path": "repos/tester-army--e2e",
+      "description": "TypeScript end-to-end test runner combining natural-language agent actions with deterministic assertions for web and mobile applications.",
+      "tags": [
+        "testing",
+        "e2e",
+        "web",
+        "mobile",
+        "playwright",
+        "agent-testing",
+        "mcp"
+      ],
+      "kind": "framework + cli + skill",
+      "rationale": "Test user journeys using Playwright or mobile simulators; verified agent actions can replay without model calls until the application changes.",
+      "requirements": [
+        "Node.js ^22.22.3 or >=24.8.0; Windows uses WSL. Install the e2e SDK and the selected web or mobile engine in the target project.",
+        "Web testing uses Playwright and its browser dependencies. Mobile testing needs Xcode and an iOS simulator, or the Android SDK and an emulator.",
+        "Agent steps require a supported subscription login, API provider credentials or local model; deterministic tests need no model. Hosted browsers/simulators are optional services.",
+        "CLI telemetry is enabled by default; E2E_TELEMETRY_DISABLED=1 or npx e2e telemetry disable opts out.",
+        "Apache-2.0; pre-1.0 APIs and configuration can change between minor releases."
+      ],
+      "entrypoints": [
+        "README.md",
+        "docs/quickstart.mdx",
+        "docs/telemetry.mdx",
+        "packages/e2e/package.json",
+        "skills/e2e/SKILL.md"
+      ],
+      "install_commands": [
+        "npx e2e init"
+      ],
+      "skill_paths": [
+        "skills/e2e/SKILL.md"
+      ],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read e2e README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Choose web or mobile, set the application target and configure a model only for agent steps; review generated configuration and telemetry preferences.",
+        "verify": "Run the generated example against the selected local application, then verify one meaningful user flow and its assertions.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "fd3a0c766b4d40c74fabdbc578e3832d80553bf9"
+      }
+    },
+    {
       "id": "ecc",
       "repo": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
@@ -10704,7 +10757,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],
@@ -11154,6 +11207,58 @@
         "source_revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
       },
       "path": "repos/mattpocock--skills"
+    },
+    {
+      "id": "moli",
+      "repo": "lexmount/moli",
+      "url": "https://github.com/lexmount/moli",
+      "commit": "b9fc881f87bf02ba4669860aaee6506684b2e7de",
+      "path": "repos/lexmount--moli",
+      "description": "Rust headless browser for JavaScript-rendered page extraction, web search and automation through CLI, CDP and WebDriver, with optional layout and screenshots.",
+      "tags": [
+        "browser",
+        "web-extraction",
+        "scraping",
+        "web-search",
+        "cdp",
+        "webdriver",
+        "screenshots"
+      ],
+      "kind": "cli + skills",
+      "rationale": "Use a standalone browser kernel for DOM-first retrieval and agent browser tasks. Enable rendering only when needed; compatibility and visual fidelity differ from Chromium.",
+      "requirements": [
+        "A compatible Moli release binary for Linux, macOS or Windows; no separate Chrome or driver installation is required.",
+        "Playwright, Puppeteer or Selenium are separate optional client dependencies for protocol automation; the open-source runtime does not require the managed Lexmount service.",
+        "Real layout, geometry and screenshots require --layout; optional media and fonts require the corresponding resource options.",
+        "MIT OR Apache-2.0 for the default code; vendored components and fixtures retain separate licenses and notices."
+      ],
+      "entrypoints": [
+        "README.md",
+        "license-metadata.json",
+        "skills/moli-webfetch/SKILL.md",
+        "skills/moli-websearch/SKILL.md",
+        "skills/moli-cdp-server/SKILL.md"
+      ],
+      "install_commands": [],
+      "skill_paths": [
+        "skills/moli-cdp-server/SKILL.md",
+        "skills/moli-webfetch/SKILL.md",
+        "skills/moli-websearch/SKILL.md"
+      ],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read moli README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Download and verify a platform release using the pinned installation guide. Keep the automation endpoint local and enable only required layout, resource and persistence options.",
+        "verify": "Run moli --version and fetch a controlled sample page as Markdown; test protocol and screenshot behavior separately if needed.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "b9fc881f87bf02ba4669860aaee6506684b2e7de"
+      }
     },
     {
       "id": "open-code-review",
@@ -12191,6 +12296,57 @@
         "source_revision": "1f73f0154c48b3d616674608af98748585b856f3"
       },
       "path": "repos/HKUDS--RAG-Anything"
+    },
+    {
+      "id": "rea",
+      "repo": "morluto/rea",
+      "url": "https://github.com/morluto/rea",
+      "commit": "9b392bb2f83decda39b4f871a079b411082bcd2f",
+      "path": "repos/morluto--rea",
+      "description": "CLI, MCP server and investigation skill for evidence-based analysis of native binaries, Electron/JavaScript applications, .NET assemblies and websites.",
+      "tags": [
+        "reverse-engineering",
+        "binary-analysis",
+        "ghidra",
+        "hopper",
+        "electron",
+        "mcp"
+      ],
+      "kind": "cli + mcp + skill",
+      "rationale": "Inspect application behavior and recover cited implementation evidence with local analysis providers; decompilation yields pseudocode, not original source.",
+      "requirements": [
+        "Node.js 22.19+ or 24.11+ and npm; supported hosts are macOS 12+, Ubuntu 24.04+, Fedora 41+ and 64-bit Arch Linux. Windows operations remain unavailable at this revision.",
+        "Native analysis requires separately installed Hopper (separate vendor license/demo limits) or Ghidra 12.1.4 with a 64-bit JDK 21; Ghidra supports Linux x64 and macOS x64/arm64.",
+        "Linux Hopper demo sessions require Python 3, Xvfb, X11 and XTEST; setup may request system package installation.",
+        "REA is MIT-licensed; analysis-provider licenses and target authorization are separate."
+      ],
+      "entrypoints": [
+        "README.md",
+        "docs/installation.md",
+        "package.json",
+        "skills/reverse-engineer-anything/SKILL.md"
+      ],
+      "install_commands": [
+        "npm install --global rea-agents",
+        "npx rea-agents setup"
+      ],
+      "skill_paths": [
+        "skills/reverse-engineer-anything/SKILL.md"
+      ],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read rea README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Select the agent registrations and analysis provider explicitly; review setup changes and preserve existing client configuration.",
+        "verify": "Run rea doctor --json, then analyze an owned local sample and inspect the evidence and provider limitations.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "9b392bb2f83decda39b4f871a079b411082bcd2f"
+      }
     },
     {
       "id": "recordly",
