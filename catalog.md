@@ -1,6 +1,6 @@
 # Tool catalog
 
-**64 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**68 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -33,6 +33,8 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [impeccable](docs/wiki/tools/impeccable.md) | skill-bundle | 20 | One frontend design router skill with 24 commands, detailed UX and visual design references, optional live browser workflows, and a deterministic design detector engine. |
 | [open-design](docs/wiki/tools/open-design.md) | application | 338 | Local design studio and daemon for prototypes, decks, images, videos, design systems, plugin catalogs, and integration with coding-agent CLIs; includes a stdio MCP interface. |
 | [taste-skill](docs/wiki/tools/taste-skill.md) | skill-bundle | 13 | Portable frontend design and redesign guidance, including experimental v2 taste, minimalist, brutalist, image-to-code, and image-generation reference workflows. |
+| [photocraft](docs/wiki/tools/photocraft.md) | desktop application + cli + mcp | 0 | Rust image editor with layered PSD workflows, masks, adjustments and automation through a headless CLI, MCP server and authenticated desktop control channel. |
+| [text-to-cad](docs/wiki/tools/text-to-cad.md) | skills + plugin + cli + mcp | 12 | Agent skills and local cadgen runtime for parametric CAD, STEP/STL/GLB/3MF exports, engineering drawings, manufacturing checks and robot descriptions. |
 
 ## Browsers, research, and web data
 
@@ -101,6 +103,8 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [pixelle-video](docs/wiki/tools/pixelle-video.md) | application | 0 | Python/Streamlit short-video creation platform combining LLM scripts, image/video workflows, speech, templates, background music, and FFmpeg composition. |
 | [recordly](docs/wiki/tools/recordly.md) | application | 0 | Electron desktop screen recorder and editor with automatic zooms, cursor effects, webcam overlays, timeline editing, and video/GIF export. |
 | [voicestudio](docs/wiki/tools/voicestudio.md) | application | 2 | Local speech studio with Electron desktop, voice cloning and design, transcription, dubbing, audiobooks, a REST API and an optional MCP connection to its running backend. |
+| [filmcraft](docs/wiki/tools/filmcraft.md) | desktop application + cli + mcp | 0 | Rust non-linear video editor with timeline editing, color grading, audio mixing, captions and export, exposed through desktop, CLI and MCP interfaces. |
+| [openmontage](docs/wiki/tools/openmontage.md) | agent workflow + tool library | 90 | Agent-directed video production workspace with staged pipelines, provider routing, production knowledge, rendering tools and a local storyboard dashboard. |
 
 ## Games and modding
 

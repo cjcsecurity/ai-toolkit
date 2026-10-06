@@ -10071,6 +10071,58 @@
       "path": "repos/affaan-m--ECC"
     },
     {
+      "id": "filmcraft",
+      "repo": "storytold/filmcraft",
+      "url": "https://github.com/storytold/filmcraft",
+      "commit": "ada55eb62568ba75be25cd12bd07b5fbdc37f88d",
+      "path": "repos/storytold--filmcraft",
+      "description": "Rust non-linear video editor with timeline editing, color grading, audio mixing, captions and export, exposed through desktop, CLI and MCP interfaces.",
+      "tags": [
+        "video-editing",
+        "timeline",
+        "color-grading",
+        "audio",
+        "captions",
+        "mcp",
+        "rust"
+      ],
+      "kind": "desktop application + cli + mcp",
+      "rationale": "Edit media with an agent-accessible command engine and interchange formats. Upstream reports substantial remaining production gaps, including platform testing and large-footage performance.",
+      "requirements": [
+        "Rust 1.95+ and Cargo for source builds; macOS requires Xcode command-line tools, Windows MSVC build tools, and Linux a C toolchain plus ALSA, GTK 3 and X11/Wayland development packages.",
+        "Desktop graphics/audio support is needed for the UI. Headless CLI and stdio MCP are separate modes. FFmpeg/ffprobe are optional test oracles, not the internal codec runtime.",
+        "Hardware decoding is currently macOS-only; no VST3/Audio Units/OpenFX hosting and no HEVC/AV1 export at this pin. Windows and Linux receive less upstream testing.",
+        "MIT OR Apache-2.0 code; third-party component and asset notices remain separate."
+      ],
+      "entrypoints": [
+        "README.md",
+        "Cargo.toml",
+        "docs/contributing.md",
+        "docs/agents.md",
+        "docs/control-protocol.md",
+        "ROADMAP.md"
+      ],
+      "install_commands": [
+        "cargo run --release -p filmcraft",
+        "cargo run --release -p filmcraft-cli -- mcp"
+      ],
+      "skill_paths": [],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read filmcraft README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Build the selected desktop or CLI target. Register stdio MCP only in the intended agent, and keep source media separate from test output.",
+        "verify": "List CLI commands, render a short disposable sample and inspect the exported frames/audio before using a real editing project.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "ada55eb62568ba75be25cd12bd07b5fbdc37f88d"
+      }
+    },
+    {
       "id": "finance-skills",
       "repo": "himself65/finance-skills",
       "url": "https://github.com/himself65/finance-skills",
@@ -11843,6 +11895,152 @@
       "path": "repos/jackwener--OpenCLI"
     },
     {
+      "id": "openmontage",
+      "repo": "calesthio/OpenMontage",
+      "url": "https://github.com/calesthio/OpenMontage",
+      "commit": "9327439db69021ab4b0e2776729bf3b58fdb5a87",
+      "path": "repos/calesthio--OpenMontage",
+      "description": "Agent-directed video production workspace with staged pipelines, provider routing, production knowledge, rendering tools and a local storyboard dashboard.",
+      "tags": [
+        "video-production",
+        "animation",
+        "demo-video",
+        "storyboard",
+        "remotion",
+        "hyperframes",
+        "ffmpeg",
+        "skills"
+      ],
+      "kind": "agent workflow + tool library",
+      "rationale": "Coordinate scripts, media generation, narration, compositing and delivery through pipeline artifacts. Select one pipeline and its providers; the skill library is retrieved on demand rather than installed globally.",
+      "requirements": [
+        "Python 3.10+, FFmpeg, Node.js 18+ for the base setup and an AI coding assistant; the HyperFrames renderer requires Node.js 22+. make setup installs Python dependencies, Remotion dependencies and attempts Piper TTS and HyperFrames setup.",
+        "Pipeline requirements vary: cloud image/video/voice providers need their own credentials and may incur charges; offline/local alternatives require suitable models and runtime resources.",
+        "Optional GPU workflows need compatible NVIDIA hardware and additional dependencies. Provider availability and quality checks must be confirmed per production.",
+        "AGPL-3.0 project license; bundled skills, dependencies and generated media have their own applicable terms."
+      ],
+      "entrypoints": [
+        "README.md",
+        "AGENT_GUIDE.md",
+        "PROJECT_CONTEXT.md",
+        "Makefile",
+        "requirements.txt",
+        "pipeline_defs",
+        "skills/pipelines",
+        "backlot/README.md"
+      ],
+      "install_commands": [
+        "make setup",
+        "make preflight"
+      ],
+      "skill_paths": [
+        ".agents/skills/3d-asset-generation/SKILL.md",
+        ".agents/skills/acestep/SKILL.md",
+        ".agents/skills/agents/SKILL.md",
+        ".agents/skills/ai-video-gen/SKILL.md",
+        ".agents/skills/atlas-cloud/SKILL.md",
+        ".agents/skills/avatar-video/SKILL.md",
+        ".agents/skills/azure-speech-to-text/SKILL.md",
+        ".agents/skills/azure-text-to-speech/SKILL.md",
+        ".agents/skills/beautiful-mermaid/SKILL.md",
+        ".agents/skills/bfl-api/SKILL.md",
+        ".agents/skills/canvas-procedural-animation/SKILL.md",
+        ".agents/skills/character-animation-qa/SKILL.md",
+        ".agents/skills/character-rigging/SKILL.md",
+        ".agents/skills/comfyui/SKILL.md",
+        ".agents/skills/create-video/SKILL.md",
+        ".agents/skills/d3-viz/SKILL.md",
+        ".agents/skills/dashscope/SKILL.md",
+        ".agents/skills/doubao-tts/SKILL.md",
+        ".agents/skills/elevenlabs/SKILL.md",
+        ".agents/skills/faceswap/SKILL.md",
+        ".agents/skills/ffmpeg/SKILL.md",
+        ".agents/skills/fish-audio-tts/SKILL.md",
+        ".agents/skills/flux-best-practices/SKILL.md",
+        ".agents/skills/framer-motion/SKILL.md",
+        ".agents/skills/gemini-omni/SKILL.md",
+        ".agents/skills/grok-media/SKILL.md",
+        ".agents/skills/gsap-core/SKILL.md",
+        ".agents/skills/gsap-frameworks/SKILL.md",
+        ".agents/skills/gsap-performance/SKILL.md",
+        ".agents/skills/gsap-plugins/SKILL.md",
+        ".agents/skills/gsap-react/SKILL.md",
+        ".agents/skills/gsap-scrolltrigger/SKILL.md",
+        ".agents/skills/gsap-timeline/SKILL.md",
+        ".agents/skills/gsap-utils/SKILL.md",
+        ".agents/skills/heygen/SKILL.md",
+        ".agents/skills/hyperframes-animation/SKILL.md",
+        ".agents/skills/hyperframes-cli/SKILL.md",
+        ".agents/skills/hyperframes-core/SKILL.md",
+        ".agents/skills/hyperframes-creative/SKILL.md",
+        ".agents/skills/hyperframes-media/SKILL.md",
+        ".agents/skills/hyperframes-registry/SKILL.md",
+        ".agents/skills/hyperframes/SKILL.md",
+        ".agents/skills/kling-official/SKILL.md",
+        ".agents/skills/lottie-bodymovin/SKILL.md",
+        ".agents/skills/ltx2/SKILL.md",
+        ".agents/skills/lyria/SKILL.md",
+        ".agents/skills/manim-composer/SKILL.md",
+        ".agents/skills/manimce-best-practices/SKILL.md",
+        ".agents/skills/manimgl-best-practices/SKILL.md",
+        ".agents/skills/media-use/SKILL.md",
+        ".agents/skills/minimax-h3/SKILL.md",
+        ".agents/skills/motion-graphics/SKILL.md",
+        ".agents/skills/music-to-video/SKILL.md",
+        ".agents/skills/music/SKILL.md",
+        ".agents/skills/playwright-recording/SKILL.md",
+        ".agents/skills/pose-library-design/SKILL.md",
+        ".agents/skills/provider-model-refresh/SKILL.md",
+        ".agents/skills/remotion-best-practices/SKILL.md",
+        ".agents/skills/remotion-to-hyperframes/SKILL.md",
+        ".agents/skills/remotion/SKILL.md",
+        ".agents/skills/seedance-2-0/SKILL.md",
+        ".agents/skills/seedance-2-5/SKILL.md",
+        ".agents/skills/setup-api-key/SKILL.md",
+        ".agents/skills/sound-effects/SKILL.md",
+        ".agents/skills/speech-to-text/SKILL.md",
+        ".agents/skills/svg-character-animation/SKILL.md",
+        ".agents/skills/synthetic-screen-recording/SKILL.md",
+        ".agents/skills/tailwind-design-system/SKILL.md",
+        ".agents/skills/text-to-speech/SKILL.md",
+        ".agents/skills/threejs-animation/SKILL.md",
+        ".agents/skills/threejs-fundamentals/SKILL.md",
+        ".agents/skills/threejs-geometry/SKILL.md",
+        ".agents/skills/threejs-interaction/SKILL.md",
+        ".agents/skills/threejs-lighting/SKILL.md",
+        ".agents/skills/threejs-loaders/SKILL.md",
+        ".agents/skills/threejs-materials/SKILL.md",
+        ".agents/skills/threejs-postprocessing/SKILL.md",
+        ".agents/skills/threejs-shaders/SKILL.md",
+        ".agents/skills/threejs-textures/SKILL.md",
+        ".agents/skills/threejs-world-generation/SKILL.md",
+        ".agents/skills/vercel-composition-patterns/SKILL.md",
+        ".agents/skills/vercel-react-best-practices/SKILL.md",
+        ".agents/skills/video-download/SKILL.md",
+        ".agents/skills/video-edit/SKILL.md",
+        ".agents/skills/video-toolkit/SKILL.md",
+        ".agents/skills/video-translate/SKILL.md",
+        ".agents/skills/video-understand/SKILL.md",
+        ".agents/skills/visual-style/SKILL.md",
+        ".agents/skills/web-design-guidelines/SKILL.md",
+        ".agents/skills/website-to-video/SKILL.md"
+      ],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read openmontage README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Use an isolated production workspace, select its pipeline and provider budget, then configure only the necessary credentials in private environment files. Use .agents/skills as the canonical Layer 3 skill collection; mirrored .claude skills are not registered twice.",
+        "verify": "Run the documented preflight and a small selected pipeline; inspect ffprobe, sampled frames, audio and stage artifacts before claiming production readiness.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "9327439db69021ab4b0e2776729bf3b58fdb5a87"
+      }
+    },
+    {
       "id": "opensandbox",
       "repo": "opensandbox-group/OpenSandbox",
       "url": "https://github.com/opensandbox-group/OpenSandbox",
@@ -11950,6 +12148,56 @@
         "source_revision": "01acdda6d3b81a5a4164533dbd8fcf43b5ae2457"
       },
       "path": "repos/vxcontrol--pentagi"
+    },
+    {
+      "id": "photocraft",
+      "repo": "storytold/photocraft",
+      "url": "https://github.com/storytold/photocraft",
+      "commit": "a96a621deea97d4b1ecd173b8b921587e33f3ca5",
+      "path": "repos/storytold--photocraft",
+      "description": "Rust image editor with layered PSD workflows, masks, adjustments and automation through a headless CLI, MCP server and authenticated desktop control channel.",
+      "tags": [
+        "image-editing",
+        "psd",
+        "layers",
+        "raster",
+        "design",
+        "mcp",
+        "rust"
+      ],
+      "kind": "desktop application + cli + mcp",
+      "rationale": "Create and edit layered images interactively or through the same command engine from agents. Upstream labels this early alpha; validate document round trips before relying on it.",
+      "requirements": [
+        "Use a platform release or build with Rust 1.90+ and Cargo. Desktop source builds support macOS, Windows and Linux; releases also include FreeBSD and web variants.",
+        "Linux source builds require libxkbcommon, Wayland, X11/Xrandr/Xi, Mesa GL and GTK 3 development packages; desktop rendering needs a supported graphics backend.",
+        "Headless CLI/MCP and desktop control are separate launch modes. Desktop control uses a private bearer token and explicit automation read/write roots.",
+        "MIT OR Apache-2.0 code; ArtCraft brand assets and third-party assets have separate terms."
+      ],
+      "entrypoints": [
+        "README.md",
+        "Cargo.toml",
+        "docs/development.md",
+        "docs/control-protocol.md",
+        "docs/contributing.md"
+      ],
+      "install_commands": [
+        "cargo run --release -p photocraft -- image.psd"
+      ],
+      "skill_paths": [],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read photocraft README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Choose a platform release or isolated source build. For automation, select headless MCP or authenticated desktop control with explicit working-directory capabilities.",
+        "verify": "Open a disposable layered sample, export an image and reopen its PSD; check CLI/MCP command discovery before automating real assets.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "a96a621deea97d4b1ecd173b8b921587e33f3ca5"
+      }
     },
     {
       "id": "pixelle-video",
@@ -13279,6 +13527,72 @@
         "source_revision": "ce26fc25c0e5e8cab638f883de62d9a86ee5e45b"
       },
       "path": "repos/Leonxlnx--taste-skill"
+    },
+    {
+      "id": "text-to-cad",
+      "repo": "earthtojake/text-to-cad",
+      "url": "https://github.com/earthtojake/text-to-cad",
+      "commit": "8ef3a97f594f9145d28692900dfe1c547852041c",
+      "path": "repos/earthtojake--text-to-cad",
+      "description": "Agent skills and local cadgen runtime for parametric CAD, STEP/STL/GLB/3MF exports, engineering drawings, manufacturing checks and robot descriptions.",
+      "tags": [
+        "cad",
+        "3d-modeling",
+        "step",
+        "stl",
+        "engineering-drawings",
+        "manufacturing",
+        "robotics",
+        "mcp"
+      ],
+      "kind": "skills + plugin + cli + mcp",
+      "rationale": "Generate and inspect geometry locally through build123d/OpenCascade, with optional fabrication and printer integrations. Install one plugin or skills route per agent to avoid duplicate skills.",
+      "requirements": [
+        "uv and Python >=3.11; the documented plugin command uses managed Python 3.13 and cadgen==0.7.14. First use needs network access for runtime downloads.",
+        "cadgen depends on build123d >=0.11.1,<0.12, cadquery-ocp-novtk >=7.9,<8, drawing libraries and Playwright; browser snapshots fetch their browser on first use. Node.js 20+ is documented for the JavaScript tooling.",
+        "Fabrication, part search and printer integrations have separate network/account/device requirements. Core geometry runs locally.",
+        "On Windows with Smart App Control, unsigned OCP modules may be blocked; WSL is an alternative without disabling that protection.",
+        "MIT core/plugin; individual skills and bundled components retain their license files. Usage analytics are opt-in; DO_NOT_TRACK=1 disables them, and CADGEN_UPDATE_CHECK=0 disables the version check."
+      ],
+      "entrypoints": [
+        "README.md",
+        "packages/cadgen/pyproject.toml",
+        "skills/cad/SKILL.md",
+        "skills/engineering-drawing/SKILL.md",
+        "skills/dfm/SKILL.md"
+      ],
+      "install_commands": [
+        "npx skills add earthtojake/text-to-cad",
+        "uvx --no-config --managed-python --python 3.13 --from cadgen==0.7.14 cadgen mcp"
+      ],
+      "skill_paths": [
+        "skills/bambu-labs/SKILL.md",
+        "skills/cad/SKILL.md",
+        "skills/dfam-check/SKILL.md",
+        "skills/dfm/SKILL.md",
+        "skills/dxf/SKILL.md",
+        "skills/engineering-drawing/SKILL.md",
+        "skills/gcode/SKILL.md",
+        "skills/sdf/SKILL.md",
+        "skills/sendcutsend/SKILL.md",
+        "skills/srdf/SKILL.md",
+        "skills/step-parts/SKILL.md",
+        "skills/urdf/SKILL.md"
+      ],
+      "recommended_scope": "on-demand",
+      "setup_scope": "project-local or isolated tool runtime; explicit agent registration",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "An isolated tool checkout or the selected target project, according to the pinned setup guide.",
+        "read_first": [
+          "toolkit read text-to-cad README.md"
+        ],
+        "install": "Reuse a compatible runtime first. Select one documented installation route, review dependencies and pin the version; commands are examples, not a script to execute in order.",
+        "configure": "Choose the documented plugin for the intended client or standalone skills, not both. Keep the viewer local; configure fabrication services and printer access only for a selected task.",
+        "verify": "Run cadgen doctor, build a small local part, inspect its exported geometry and open it in the viewer before fabrication.",
+        "record_result": "Record the actual runtime version, checks and remaining requirements locally. Catalog/source presence does not establish runtime readiness.",
+        "source_revision": "8ef3a97f594f9145d28692900dfe1c547852041c"
+      }
     },
     {
       "id": "universal-modder",
