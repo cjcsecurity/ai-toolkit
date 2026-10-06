@@ -61,7 +61,14 @@ def updated_content(old: bytes, block: bytes) -> bytes:
     return old[:start] + block + old[end + len(END):]
 
 
+def check_parents(path: Path) -> None:
+    for parent in path.parents:
+        if (parent.exists() or parent.is_symlink()) and not parent.is_dir():
+            raise ValueError(f'Refusing non-directory or broken parent at {parent}; move it aside explicitly')
+
+
 def check_link(path: Path, target: Path) -> None:
+    check_parents(path)
     if path.is_symlink() and path.resolve() == target.resolve():
         return
     if path.exists() or path.is_symlink():
@@ -116,6 +123,7 @@ def install(root: Path, home: Path, client: str, *, dry_run: bool = False) -> No
         if CLIENTS[name] is None:
             continue
         path = home / CLIENTS[name]
+        check_parents(path)
         if path.is_symlink():
             raise ValueError(f'Refusing symlinked agent instructions at {path}; manage that file explicitly')
         old = path.read_bytes() if path.exists() else b''

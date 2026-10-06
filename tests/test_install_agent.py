@@ -163,6 +163,25 @@ class AgentInstallTests(unittest.TestCase):
         self.assertIn('.claude/skills/toolkit-selector', result.stdout)
         self.assertFalse(self.home.exists())
 
+    def test_invalid_parent_prevents_partial_install_including_dry_run(self):
+        from scripts.install_agent import install
+        for client, relative in [('cursor', '.cursor/skills'), ('claude', '.claude')]:
+            for broken_link in [False, True]:
+                with self.subTest(client=client, broken_link=broken_link):
+                    home = self.home / f'{client}-{broken_link}'
+                    parent = home / relative
+                    parent.parent.mkdir(parents=True)
+                    if broken_link:
+                        parent.symlink_to(home / 'missing')
+                    else:
+                        parent.write_text('Unrelated file')
+                    before = sorted(str(p.relative_to(home)) for p in home.rglob('*'))
+                    for dry_run in [True, False]:
+                        with self.assertRaisesRegex(ValueError, 'Refusing'):
+                            install(self.root, home, client, dry_run=dry_run)
+                        self.assertEqual(sorted(str(p.relative_to(home)) for p in home.rglob('*')), before)
+                        self.assertFalse((home / '.local').exists())
+
 
 if __name__ == '__main__':
     unittest.main()
