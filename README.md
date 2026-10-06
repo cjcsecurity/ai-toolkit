@@ -75,6 +75,8 @@ For the entire library, use `python3 scripts/bootstrap.py --all --semantic`. A c
 
 </details>
 
+After upgrading an existing installation to chunk-based discovery, rebuild its semantic index with `bin/toolkit index --semantic`. This corpus version requires a rebuild; unchanged compatible vectors are reused. RAG/MCP reads do not rebuild indexes automatically. For a lexical-only installation, use `bin/toolkit index --lexical`.
+
 ## How discovery works
 
 ```mermaid
@@ -97,6 +99,18 @@ bin/toolkit select playwright --project /path/to/project
 ```
 
 `select` records a project's preferences in `.ai-toolkit.json`; it does not install dependencies or start services. Rankings help with discovery. Inspect the requirements and source evidence before choosing a tool.
+
+Collections can contain many useful services. With their source downloaded, free-for-dev hosting entries and public-apis API rows are searched as individual passages, with category and table-column context. Repository discovery combines each project's strongest keyword and semantic matches; repeated chunks add no extra ranking votes. Without a local source checkout, a project can still match its catalog summary.
+
+For example, find free hosting through the services inside free-for-dev:
+
+```bash
+python3 scripts/bootstrap.py --repo free-for-dev --semantic
+bin/toolkit search "host my web app for free" --kind repo --limit 3
+bin/toolkit docs free-for-dev "static site hosting" --limit 3
+```
+
+Repository results include `matches` with the service name, source path, line range, and excerpt. Use those passages to shortlist providers, then verify their current official pricing and limits before choosing. See [retrieval details](docs/wiki/Retrieval-System.md) for chunking and ranking behavior.
 
 ## Local RAG for coding agents
 
@@ -172,6 +186,8 @@ Browse [the full catalog](catalog.md) or expand the inventory below. Each tool l
 | [open-code-review](docs/wiki/tools/open-code-review.md) | cli | 2 | Go-based code review CLI combining deterministic Git diff selection, file grouping and review rules with model-backed line-level findings, full-file scans and host-agent delegation without a separate OCR LLM endpoint. |
 | [ponytail](docs/wiki/tools/ponytail.md) | skill-bundle | 6 | Coding simplification skills for reuse-first implementation, over-engineering review, repository audits and deferred-shortcut tracking, with optional multi-agent-host plugins, lifecycle hooks and an MCP instruction server. |
 | [serena](docs/wiki/tools/serena.md) | mcp | 0 | MCP coding toolkit with language-server-backed symbol lookup, reference navigation, semantic editing, refactoring and project memories. |
+| [rea](docs/wiki/tools/rea.md) | cli + mcp + skill | 1 | CLI, MCP server and investigation skill for evidence-based analysis of native binaries, Electron/JavaScript applications, .NET assemblies and websites. |
+| [e2e](docs/wiki/tools/e2e.md) | framework + cli + skill | 1 | TypeScript end-to-end test runner combining natural-language agent actions with deterministic assertions for web and mobile applications. |
 
 ### Design and interfaces
 
@@ -184,6 +200,8 @@ Browse [the full catalog](catalog.md) or expand the inventory below. Each tool l
 | [impeccable](docs/wiki/tools/impeccable.md) | skill-bundle | 20 | One frontend design router skill with 24 commands, detailed UX and visual design references, optional live browser workflows, and a deterministic design detector engine. |
 | [open-design](docs/wiki/tools/open-design.md) | application | 338 | Local design studio and daemon for prototypes, decks, images, videos, design systems, plugin catalogs, and integration with coding-agent CLIs; includes a stdio MCP interface. |
 | [taste-skill](docs/wiki/tools/taste-skill.md) | skill-bundle | 13 | Portable frontend design and redesign guidance, including experimental v2 taste, minimalist, brutalist, image-to-code, and image-generation reference workflows. |
+| [photocraft](docs/wiki/tools/photocraft.md) | desktop application + cli + mcp | 0 | Rust image editor with layered PSD workflows, masks, adjustments and automation through a headless CLI, MCP server and authenticated desktop control channel. |
+| [text-to-cad](docs/wiki/tools/text-to-cad.md) | skills + plugin + cli + mcp | 12 | Agent skills and local cadgen runtime for parametric CAD, STEP/STL/GLB/3MF exports, engineering drawings, manufacturing checks and robot descriptions. |
 
 ### Browsers, research, and web data
 
@@ -199,7 +217,9 @@ Browse [the full catalog](catalog.md) or expand the inventory below. Each tool l
 | [opencli](docs/wiki/tools/opencli.md) | cli | 6 | TypeScript CLI with website/Electron adapters and browser primitives using a Chrome extension and local bridge daemon. |
 | [playwright](docs/wiki/tools/playwright.md) | framework | 3 | Browser automation and end-to-end tests across Chromium, Firefox and WebKit, with locators, web-first assertions, screenshots, network mocking, tracing and production CLI/trace/component-testing skills. |
 | [public-apis](docs/wiki/tools/public-apis.md) | reference | 0 | Curated catalog of public APIs organized by topic, with descriptions and authentication, HTTPS, and CORS information. |
+| [free-for-dev](docs/wiki/tools/free-for-dev.md) | reference | 0 | Find free hosting platforms for web apps, static websites and React/Vite projects. Compare free tiers for hosting, databases, authentication, storage, email, monitoring, CI/CD, APIs and cloud services. Community-maintained reference includes Cloudflare Pages, Netlify and Vercel; verify current official provider limits before choosing. |
 | [scrapling](docs/wiki/tools/scrapling.md) | cli | 1 | Python HTML parser, HTTP/browser fetchers, adaptive selectors, spider framework, scraping CLI, and optional MCP server. |
+| [moli](docs/wiki/tools/moli.md) | cli + skills | 3 | Rust headless browser for JavaScript-rendered page extraction, web search and automation through CLI, CDP and WebDriver, with optional layout and screenshots. |
 
 ### Security and assessment
 
@@ -251,6 +271,14 @@ Browse [the full catalog](catalog.md) or expand the inventory below. Each tool l
 | [pixelle-video](docs/wiki/tools/pixelle-video.md) | application | 0 | Python/Streamlit short-video creation platform combining LLM scripts, image/video workflows, speech, templates, background music, and FFmpeg composition. |
 | [recordly](docs/wiki/tools/recordly.md) | application | 0 | Electron desktop screen recorder and editor with automatic zooms, cursor effects, webcam overlays, timeline editing, and video/GIF export. |
 | [voicestudio](docs/wiki/tools/voicestudio.md) | application | 2 | Local speech studio with Electron desktop, voice cloning and design, transcription, dubbing, audiobooks, a REST API and an optional MCP connection to its running backend. |
+| [filmcraft](docs/wiki/tools/filmcraft.md) | desktop application + cli + mcp | 0 | Rust non-linear video editor with timeline editing, color grading, audio mixing, captions and export, exposed through desktop, CLI and MCP interfaces. |
+| [openmontage](docs/wiki/tools/openmontage.md) | agent workflow + tool library | 90 | Agent-directed video production workspace with staged pipelines, provider routing, production knowledge, rendering tools and a local storyboard dashboard. |
+
+### Games and modding
+
+| Tool | Type | Skills | Purpose |
+| --- | --- | ---: | --- |
+| [universal-modder](docs/wiki/tools/universal-modder.md) | cli-and-skill-bundle | 10 | Game-modding skills and Python CLI for engine recon, reverse engineering, sprite and 3D-to-sprite pipelines, Windows capture, video editing, packaging checks and shared field notes. |
 
 </details>
 
