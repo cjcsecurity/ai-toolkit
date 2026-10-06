@@ -18,7 +18,7 @@ CATEGORIES = {
     'Engineering and code intelligence': [
         'agent-skills', 'ast-grep', 'codebase-memory-mcp', 'context7', 'ecc',
         'gh-aw', 'loop-engineering', 'matt-pocock-skills', 'open-code-review',
-        'ponytail', 'serena',
+        'ponytail', 'serena', 'rea', 'e2e',
     ],
     'Design and interfaces': [
         'animate-ui', 'archify', 'awesome-claude-design', 'huashu-design',
@@ -27,7 +27,7 @@ CATEGORIES = {
     'Browsers, research, and web data': [
         'agent-reach', 'autocli', 'browser-harness', 'chrome-devtools-mcp',
         'cloakbrowser', 'crucix', 'firecrawl', 'opencli', 'playwright',
-        'public-apis', 'scrapling',
+        'public-apis', 'scrapling', 'moli',
     ],
     'Security and assessment': [
         'agentic-bug-hunter', 'anthropic-cybersecurity-skills', 'cyberstrike',
