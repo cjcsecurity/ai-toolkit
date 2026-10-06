@@ -148,6 +148,8 @@ Choose `--client claude`, `codex`, `opencode`, `gemini`, `cursor`, `copilot`, or
 
 The selector teaches the agent to compare systems, retrieve relevant instructions, and reuse project choices. Specialized skills and MCP servers stay on demand. [Agent integration](docs/wiki/Agent-Integration.md) covers layout and scope. [Superpowers](https://github.com/obra/superpowers) is an optional complementary workflow, installed separately from the catalog.
 
+Prefer native MCP tools? After [RAG setup](docs/rag.md), run `python3 scripts/mcp_config.py --client claude` to print the host configuration. Profiles also cover Cursor, Gemini CLI, VS Code, Copilot CLI, Windsurf, Cline, Roo Code, Continue, Codex, and OpenCode. See the [connection guide](docs/wiki/Agent-Integration.md#connect-the-rag-server) for destinations and verification.
+
 ## Tool catalog
 
 Browse [the full catalog](catalog.md) or expand the inventory below. Each tool links to a guide with requirements, setup options, and pinned upstream sources. Skill counts refer to cataloged paths, not globally installed skills.

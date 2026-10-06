@@ -21,7 +21,7 @@ bin/toolkit show scrapling
 
 `--budget` and `--root` precede the subcommand. `--limit` caps candidates; budget packing can return fewer. `--lexical` requests keyword-only retrieval. `--project` reads only `.ai-toolkit.json` in the explicit directory, preserving preferences without scanning source code. Constraints accompany the evidence for the agent to assess; they are not automatic compatibility filters.
 
-After [agent registration](wiki/Codex-and-OpenCode.md), shell-capable agents can use `toolkit` and MCP hosts can launch `toolkit-rag-mcp`. Registration does not install optional dependencies or change MCP host settings.
+After [agent registration](wiki/Agent-Integration.md), shell-capable agents can use `toolkit` and MCP hosts can launch `toolkit-rag-mcp`. Registration does not install optional dependencies or change MCP host settings.
 
 ## Architecture
 
@@ -94,7 +94,11 @@ The RAG lock includes the search dependencies plus the official MCP SDK. Syncing
 
 ## Connect an MCP host
 
-The server uses local stdio and opens no HTTP listener. After installing `requirements-rag.txt`, configure a host using its supported stdio settings. For hosts with the common `mcpServers` shape:
+The server uses local stdio and opens no HTTP listener. After installing `requirements-rag.txt`, configure a host using its supported stdio settings.
+
+For a ready-to-use configuration with explicit interpreter and index paths, run `python3 scripts/mcp_config.py --client claude` (or another supported client). The [coding-agent guide](wiki/Agent-Integration.md#connect-the-rag-server) covers Claude Code, Cursor, Gemini CLI, VS Code, Copilot CLI, Windsurf, Cline, Roo Code, Continue, Codex, and OpenCode, including each host's configuration destination. Merge the printed entry into existing settings rather than replacing the file.
+
+For hosts with the common `mcpServers` shape, the launcher is also available:
 
 ```json
 {
