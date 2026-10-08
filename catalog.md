@@ -1,6 +1,6 @@
 # Tool catalog
 
-**69 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**70 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -106,6 +106,7 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [voicestudio](docs/wiki/tools/voicestudio.md) | application | 2 | Local speech studio with Electron desktop, voice cloning and design, transcription, dubbing, audiobooks, a REST API and an optional MCP connection to its running backend. |
 | [filmcraft](docs/wiki/tools/filmcraft.md) | desktop application + cli + mcp | 0 | Rust non-linear video editor with timeline editing, color grading, audio mixing, captions and export, exposed through desktop, CLI and MCP interfaces. |
 | [openmontage](docs/wiki/tools/openmontage.md) | agent workflow + tool library | 90 | Agent-directed video production workspace with staged pipelines, provider routing, production knowledge, rendering tools and a local storyboard dashboard. |
+| [inference-video-skills](docs/wiki/tools/inference-video-skills.md) | cli | 1 | AI video generation recipes for inference.sh belt CLI, including text-to-video, image-to-video, avatars, lip sync and editing. |
 
 ## Games and modding
 

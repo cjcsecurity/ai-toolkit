@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "catalog_revision_date": "2026-10-05",
+  "catalog_revision_date": "2026-10-08",
   "tools": [
     {
       "id": "agent-reach",
@@ -10863,7 +10863,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],
@@ -10971,6 +10971,54 @@
         "source_revision": "14dafe9c8c2186a9608c7e96edfe7ee69a1923ec"
       },
       "path": "repos/pbakaus--impeccable"
+    },
+    {
+      "id": "inference-video-skills",
+      "repo": "101-skills/superpowers",
+      "url": "https://github.com/101-skills/superpowers",
+      "commit": "becc25649700d5457772a00e5143e28ccf9e5afa",
+      "path": "repos/101-skills--superpowers",
+      "description": "AI video generation recipes for inference.sh belt CLI, including text-to-video, image-to-video, avatars, lip sync and editing.",
+      "tags": [
+        "AI video generation",
+        "inference.sh",
+        "belt",
+        "text to video",
+        "image to video"
+      ],
+      "kind": "cli",
+      "recommended_scope": "on-demand",
+      "rationale": "On-demand video source. Despite its repository name, this is an inference.sh-oriented collection, not the obra/Superpowers engineering workflow. Register only the requested video skill; related upstream skills remain optional references.",
+      "requirements": [
+        "Reading the skill requires no runtime. Execution requires the inference.sh belt CLI and authenticated account with access to the selected hosted model.",
+        "Model availability, account quotas and charges require current provider verification; prompts and media are sent to the hosted service.",
+        "CLI installation is separately versioned. Prefer a reviewed package-manager release over executing the remote curl-to-shell example."
+      ],
+      "entrypoints": [
+        "README.md",
+        "cli-install.md",
+        "tools/video/ai-video-generation/SKILL.md"
+      ],
+      "skill_paths": [
+        "tools/video/ai-video-generation/SKILL.md"
+      ],
+      "install_commands": [
+        "npx skills add 101-skills/superpowers --skill ai-video-generation",
+        "npx @inferencesh/belt --help"
+      ],
+      "setup_scope": "shared on-demand source; selected project or isolated runtime only",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "Read from the pinned checkout; apply only in the selected target project.",
+        "read_first": [
+          "toolkit read inference-video-skills README.md"
+        ],
+        "install": "Source download and retrieval require no upstream runtime. For execution, reuse a compatible runtime or provision one isolated version following the pinned guide. Registration commands are alternatives, not an execution queue; do not install the entire collection globally.",
+        "configure": "Choose and review a CLI release, authenticate only for a requested generation task, and verify model inputs and cost before submitting media. Preserve existing local-video alternatives.",
+        "verify": "Read the skill and installation guide; separately check belt version, authentication and one authorized bounded generation when selected.",
+        "record_result": "Record actual runtime and authentication checks in local project notes; source availability is not runtime readiness.",
+        "source_revision": "becc25649700d5457772a00e5143e28ccf9e5afa"
+      }
     },
     {
       "id": "langfuse",
