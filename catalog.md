@@ -1,6 +1,6 @@
 # Tool catalog
 
-**69 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**70 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -35,6 +35,7 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [taste-skill](docs/wiki/tools/taste-skill.md) | skill-bundle | 13 | Portable frontend design and redesign guidance, including experimental v2 taste, minimalist, brutalist, image-to-code, and image-generation reference workflows. |
 | [photocraft](docs/wiki/tools/photocraft.md) | desktop application + cli + mcp | 0 | Rust image editor with layered PSD workflows, masks, adjustments and automation through a headless CLI, MCP server and authenticated desktop control channel. |
 | [text-to-cad](docs/wiki/tools/text-to-cad.md) | skills + plugin + cli + mcp | 12 | Agent skills and local cadgen runtime for parametric CAD, STEP/STL/GLB/3MF exports, engineering drawings, manufacturing checks and robot descriptions. |
+| [anthropic-skills](docs/wiki/tools/anthropic-skills.md) | skill-bundle | 1 | Anthropic frontend-design guidance for distinctive, accessible interfaces, visual hierarchy, restrained motion and clear product copy. |
 
 ## Browsers, research, and web data
 
