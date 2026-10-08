@@ -1,7 +1,58 @@
 {
   "version": 1,
-  "catalog_revision_date": "2026-10-05",
+  "catalog_revision_date": "2026-10-08",
   "tools": [
+    {
+      "id": "agent-browser",
+      "repo": "vercel-labs/agent-browser",
+      "url": "https://github.com/vercel-labs/agent-browser",
+      "commit": "0207911f1bd4d0393eddaa90f2e50f96e0fb8974",
+      "path": "repos/vercel-labs--agent-browser",
+      "description": "Native browser automation CLI with accessibility snapshots, compact element references, named sessions, screenshots and version-matched agent instructions.",
+      "tags": [
+        "browser automation",
+        "accessibility snapshots",
+        "web testing",
+        "screenshots",
+        "agent-browser"
+      ],
+      "kind": "cli",
+      "recommended_scope": "on-demand",
+      "rationale": "On-demand alternative to existing Chrome DevTools and Playwright integrations. The public agent-browser skill is a discovery stub; read skill-data/core or installed CLI skills get core before use. Its preference for itself does not override the host tool policy. Register only the requested stub and supporting core; specialized workflows remain source references.",
+      "requirements": [
+        "Chrome/Chromium and Linux browser libraries; existing Chrome, Brave, Playwright or Puppeteer browsers can be reused.",
+        "Published native binary supports package-manager installation; source build requires Node.js 24+, pnpm 11+ and Rust.",
+        "Cloud browsers, Slack/Electron sessions and protected deployments have separate account/access prerequisites; not needed for a local public-page check."
+      ],
+      "entrypoints": [
+        "README.md",
+        "package.json",
+        "skills/agent-browser/SKILL.md",
+        "skill-data/core/SKILL.md"
+      ],
+      "skill_paths": [
+        "skills/agent-browser/SKILL.md",
+        "skill-data/core/SKILL.md"
+      ],
+      "install_commands": [
+        "npm install agent-browser",
+        "agent-browser skills get core",
+        "agent-browser install"
+      ],
+      "setup_scope": "shared on-demand source; selected project or isolated runtime only",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "Read from the pinned checkout; apply only in the selected target project.",
+        "read_first": [
+          "toolkit read agent-browser README.md"
+        ],
+        "install": "Source download and retrieval require no upstream runtime. For execution, reuse a compatible runtime or provision one isolated version following the pinned guide. Registration commands are alternatives, not an execution queue; do not install the entire collection globally.",
+        "configure": "Use an isolated named session and a reviewed runtime version. Reuse existing browser binaries where compatible; do not attach to personal authenticated sessions implicitly.",
+        "verify": "Verify version, load version-matched core instructions, open a public test page, inspect a snapshot and close the named session.",
+        "record_result": "Record actual runtime and authentication checks in local project notes; source availability is not runtime readiness.",
+        "source_revision": "0207911f1bd4d0393eddaa90f2e50f96e0fb8974"
+      }
+    },
     {
       "id": "agent-reach",
       "repo": "Panniantong/Agent-Reach",
@@ -10863,7 +10914,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],

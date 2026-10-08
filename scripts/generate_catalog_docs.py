@@ -28,7 +28,7 @@ CATEGORIES = {
         'agent-reach', 'autocli', 'browser-harness', 'chrome-devtools-mcp',
         'cloakbrowser', 'crucix', 'firecrawl', 'opencli', 'playwright',
         'public-apis', 'free-for-dev', 'scrapling', 'moli',
-    ],
+     'agent-browser'],
     'Security and assessment': [
         'agentic-bug-hunter', 'anthropic-cybersecurity-skills', 'cyberstrike',
         'hackingtool', 'hexstrike-ai', 'pentagi', 'security-audit-skill',
