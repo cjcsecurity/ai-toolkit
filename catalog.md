@@ -1,6 +1,6 @@
 # Tool catalog
 
-**69 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**70 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -112,3 +112,9 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | Tool | Type | Skills | Purpose |
 | --- | --- | ---: | --- |
 | [universal-modder](docs/wiki/tools/universal-modder.md) | cli-and-skill-bundle | 10 | Game-modding skills and Python CLI for engine recon, reverse engineering, sprite and 3D-to-sprite pipelines, Windows capture, video editing, packaging checks and shared field notes. |
+
+## Workplace and marketing
+
+| Tool | Type | Skills | Purpose |
+| --- | --- | ---: | --- |
+| [reddit-automation](docs/wiki/tools/reddit-automation.md) | skill-bundle | 1 | Documentation-only Reddit opportunity research and draft replies with affiliation disclosure, community-rule checks and human posting. |
