@@ -19,7 +19,7 @@ CATEGORIES = {
         'agent-skills', 'ast-grep', 'codebase-memory-mcp', 'context7', 'ecc',
         'gh-aw', 'loop-engineering', 'matt-pocock-skills', 'open-code-review',
         'ponytail', 'serena', 'rea', 'e2e',
-    ],
+     'vercel-skills'],
     'Design and interfaces': [
         'animate-ui', 'archify', 'awesome-claude-design', 'huashu-design',
         'impeccable', 'open-design', 'taste-skill', 'photocraft', 'text-to-cad',

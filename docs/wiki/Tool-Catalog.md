@@ -1,6 +1,6 @@
 # Tool catalog
 
-**69 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
+**70 reviewed tools and collections**, grouped by their main use. Categories are navigation aids; many tools span several areas. Each tool page includes requirements, setup alternatives, skill counts, and links to its exact upstream source revision.
 
 Catalog membership does not imply downloaded source or a configured runtime. Global recommendations are optional adoption choices, never automatic installation.
 
@@ -21,6 +21,7 @@ Catalog membership does not imply downloaded source or a configured runtime. Glo
 | [serena](tools/serena.md) | mcp | 0 | MCP coding toolkit with language-server-backed symbol lookup, reference navigation, semantic editing, refactoring and project memories. |
 | [rea](tools/rea.md) | cli + mcp + skill | 1 | CLI, MCP server and investigation skill for evidence-based analysis of native binaries, Electron/JavaScript applications, .NET assemblies and websites. |
 | [e2e](tools/e2e.md) | framework + cli + skill | 1 | TypeScript end-to-end test runner combining natural-language agent actions with deterministic assertions for web and mobile applications. |
+| [vercel-skills](tools/vercel-skills.md) | cli | 1 | Vercel Skills CLI and find-skills guidance for discovering, inspecting and selectively installing skills from GitHub and well-known website indexes. |
 
 ## Design and interfaces
 
