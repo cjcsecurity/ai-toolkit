@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "catalog_revision_date": "2026-10-05",
+  "catalog_revision_date": "2026-10-08",
   "tools": [
     {
       "id": "agent-reach",
@@ -10863,7 +10863,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],
@@ -11020,6 +11020,90 @@
         "source_revision": "9a29212e855c60ffb86d1989b62918b3781d9652"
       },
       "path": "repos/langfuse--langfuse"
+    },
+    {
+      "id": "lark-cli",
+      "repo": "larksuite/cli",
+      "url": "https://github.com/larksuite/cli",
+      "commit": "7beffb086d7fa3c5b843d8affa7c089f49cfc65e",
+      "path": "repos/larksuite--cli",
+      "description": "Official Lark/Feishu CLI skills for docs, spreadsheets, Base, drive, messages, calendar, mail, approvals, tasks, meetings, OKRs and workplace workflows.",
+      "tags": [
+        "Lark",
+        "Feishu",
+        "workplace automation",
+        "documents",
+        "spreadsheets",
+        "calendar",
+        "meetings",
+        "approvals",
+        "open.feishu.cn"
+      ],
+      "kind": "cli",
+      "recommended_scope": "on-demand",
+      "rationale": "The 24 open.feishu.cn top-50 SKILL.md bodies exactly matched this pinned official repository during review. Register all 28 production skills because several top-50 workflows depend on non-top-50 meeting/note skills. Keep the collection on demand; it is workplace-specific and can access or modify private workspace data. Test and template skills are excluded.",
+      "requirements": [
+        "Skill text needs no runtime. Published @larksuite/cli package requires Node.js >=16 and a supported native platform.",
+        "Source build requires Go >=1.23 and Python 3 according to README; inspect go.mod for the exact toolchain before building.",
+        "Actual workspace operations require a Lark/Feishu app, user or bot authentication, tenant access and operation-specific scopes.",
+        "Preserve sibling lark-shared, lark-meeting and references; upstream instructions are primarily Chinese.",
+        "Credentials use platform storage; never print tokens. High-risk writes have an explicit confirmation gate and supported commands offer dry-run.",
+        "SkillSpector static analysis is partial for several references and flags documented credential, deletion and validation-bypass surfaces. Review the chosen workflow and scripts before execution; cataloging is not blanket runtime approval."
+      ],
+      "entrypoints": [
+        "README.md",
+        "package.json",
+        "skills/lark-shared/SKILL.md",
+        "skills/lark-shared/references/lark-shared-high-risk-approval.md",
+        "skills/lark-meeting/SKILL.md"
+      ],
+      "skill_paths": [
+        "skills/lark-approval/SKILL.md",
+        "skills/lark-apps/SKILL.md",
+        "skills/lark-attendance/SKILL.md",
+        "skills/lark-base/SKILL.md",
+        "skills/lark-calendar/SKILL.md",
+        "skills/lark-contact/SKILL.md",
+        "skills/lark-doc/SKILL.md",
+        "skills/lark-drive/SKILL.md",
+        "skills/lark-event/SKILL.md",
+        "skills/lark-im/SKILL.md",
+        "skills/lark-mail/SKILL.md",
+        "skills/lark-markdown/SKILL.md",
+        "skills/lark-meeting/SKILL.md",
+        "skills/lark-minutes/SKILL.md",
+        "skills/lark-note/SKILL.md",
+        "skills/lark-okr/SKILL.md",
+        "skills/lark-openapi-explorer/SKILL.md",
+        "skills/lark-shared/SKILL.md",
+        "skills/lark-sheets/SKILL.md",
+        "skills/lark-skill-maker/SKILL.md",
+        "skills/lark-slides/SKILL.md",
+        "skills/lark-task/SKILL.md",
+        "skills/lark-vc-agent/SKILL.md",
+        "skills/lark-vc/SKILL.md",
+        "skills/lark-whiteboard/SKILL.md",
+        "skills/lark-wiki/SKILL.md",
+        "skills/lark-workflow-meeting-summary/SKILL.md",
+        "skills/lark-workflow-standup-report/SKILL.md"
+      ],
+      "install_commands": [
+        "npx @larksuite/cli@1.0.97 install",
+        "lark-cli auth status"
+      ],
+      "setup_scope": "shared on-demand source; selected project or isolated runtime only",
+      "agent_setup": {
+        "action": "setup-required",
+        "working_directory": "Read from the pinned checkout; apply only in the selected target project.",
+        "read_first": [
+          "toolkit read lark-cli README.md"
+        ],
+        "install": "Source download and retrieval require no upstream runtime. For execution, reuse a compatible runtime or provision one isolated version following the pinned guide. Registration commands are alternatives, not an execution queue; do not install the entire collection globally.",
+        "configure": "Install only for an actual Lark task; inspect installer skill-registration scope. Configure the chosen app and minimal domains, distinguish user/bot identity and retain high-risk confirmations. No account authorization is implied by cataloging.",
+        "verify": "Verify selected skill and sibling references; for runtime setup check version, auth status and a minimal authorized read before any write.",
+        "record_result": "Record actual runtime and authentication checks in local project notes; source availability is not runtime readiness.",
+        "source_revision": "7beffb086d7fa3c5b843d8affa7c089f49cfc65e"
+      }
     },
     {
       "id": "laya",

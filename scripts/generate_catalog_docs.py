@@ -45,6 +45,8 @@ CATEGORIES = {
     ],
 
     'Games and modding': ['universal-modder'],
+
+    'Workplace and marketing': ['lark-cli'],
 }
 
 
