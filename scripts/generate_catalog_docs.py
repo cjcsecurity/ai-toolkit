@@ -42,7 +42,7 @@ CATEGORIES = {
     'Writing, video, and audio': [
         'brag', 'humanizer', 'hyperframes', 'hypit', 'pixelle-video',
         'recordly', 'voicestudio', 'filmcraft', 'openmontage',
-    ],
+     'inference-video-skills'],
 
     'Games and modding': ['universal-modder'],
 }
