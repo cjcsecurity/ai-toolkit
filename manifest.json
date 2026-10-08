@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "catalog_revision_date": "2026-10-05",
+  "catalog_revision_date": "2026-10-08",
   "tools": [
     {
       "id": "agent-reach",
@@ -1203,6 +1203,52 @@
         "source_revision": "54a798831d2266a3ca61ce68a7acb80b81160d57"
       },
       "path": "repos/mukul975--Anthropic-Cybersecurity-Skills"
+    },
+    {
+      "id": "anthropic-skills",
+      "repo": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "path": "repos/anthropics--skills",
+      "description": "Anthropic frontend-design guidance for distinctive, accessible interfaces, visual hierarchy, restrained motion and clear product copy.",
+      "tags": [
+        "frontend design",
+        "interface design",
+        "accessibility",
+        "typography",
+        "UX writing"
+      ],
+      "kind": "skill-bundle",
+      "recommended_scope": "on-demand",
+      "rationale": "Register only the requested frontend-design skill. Existing Impeccable already covers global frontend design and accessibility; use this as an optional reference rather than a second automatic design workflow. Other repository skills are not promoted by this entry, though source auto-discovery may retrieve them.",
+      "requirements": [
+        "Frontend-design is Markdown guidance with no required runtime; testing/rendering depends on the selected frontend project.",
+        "Repository mixes licenses: frontend-design has an Apache-2.0 LICENSE.txt in its own directory; document skills have separate source-available terms. Review individual licenses before adopting other skills."
+      ],
+      "entrypoints": [
+        "README.md",
+        "skills/frontend-design/LICENSE.txt",
+        "skills/frontend-design/SKILL.md"
+      ],
+      "skill_paths": [
+        "skills/frontend-design/SKILL.md"
+      ],
+      "install_commands": [
+        "npx skills add anthropics/skills --skill frontend-design"
+      ],
+      "setup_scope": "shared on-demand source; selected project or isolated runtime only",
+      "agent_setup": {
+        "action": "read-guidance",
+        "working_directory": "Read from the pinned checkout; apply only in the selected target project.",
+        "read_first": [
+          "toolkit read anthropic-skills README.md"
+        ],
+        "install": "Source download and retrieval require no upstream runtime. Registration commands are alternatives, not an execution queue; do not install the entire collection globally.",
+        "configure": "Preserve the project design system and user brief; read only the selected skill. Do not activate unrelated document-generation or provider-specific workflows.",
+        "verify": "Confirm frontend-design and license exist; validate resulting UI with the target project tools when actually used.",
+        "record_result": "Record actual runtime and authentication checks in local project notes; source availability is not runtime readiness.",
+        "source_revision": "683bc88e56f3e09ba94f7055977f3d3aa499f202"
+      }
     },
     {
       "id": "arcbox",
@@ -10863,7 +10909,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],

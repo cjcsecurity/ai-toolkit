@@ -23,7 +23,7 @@ CATEGORIES = {
     'Design and interfaces': [
         'animate-ui', 'archify', 'awesome-claude-design', 'huashu-design',
         'impeccable', 'open-design', 'taste-skill', 'photocraft', 'text-to-cad',
-    ],
+     'anthropic-skills'],
     'Browsers, research, and web data': [
         'agent-reach', 'autocli', 'browser-harness', 'chrome-devtools-mcp',
         'cloakbrowser', 'crucix', 'firecrawl', 'opencli', 'playwright',
