@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "catalog_revision_date": "2026-10-05",
+  "catalog_revision_date": "2026-10-08",
   "tools": [
     {
       "id": "agent-reach",
@@ -10863,7 +10863,7 @@
       "requirements": [
         "Node.js >=22.15 and pnpm 10.33.x",
         "Live builds need ffmpeg/ffprobe, downloaded Chrome/Chromium and relevant programs",
-        "Local WhisperX/OpenCV programs require Python 3.10\u20133.13 and uv",
+        "Local WhisperX/OpenCV programs require Python 3.10–3.13 and uv",
         "Optional generation services require accounts/credentials; code-rendered visuals need no generation API",
         "Review platform-specific runtime dependencies before provisioning"
       ],
@@ -13734,6 +13734,58 @@
         "source_revision": "0f5dcdfdcd8ed420f8413815bd6647586ab894a2"
       },
       "path": "repos/rehan-remade--universal-modder"
+    },
+    {
+      "id": "vercel-agent-skills",
+      "repo": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "repos/vercel-labs--agent-skills",
+      "description": "Vercel React and Next.js performance rules plus web-interface audits for accessibility, forms, navigation, motion and rendering quality.",
+      "tags": [
+        "React",
+        "Next.js",
+        "performance",
+        "bundle size",
+        "waterfalls",
+        "web design",
+        "accessibility"
+      ],
+      "kind": "skill-bundle",
+      "recommended_scope": "on-demand",
+      "rationale": "React guidance is a strong conditional global candidate for React/Next.js tasks, not every project. UI audit overlaps Impeccable and is best on demand. Only the two top-50 skills are registered; deployment and token workflows are not activated. Static review flagged literal-script examples and parser limits; retain source-aware review rather than treating a scanner score as approval.",
+      "requirements": [
+        "Markdown guidance requires no package runtime; React/Next.js rules apply to matching projects and versions.",
+        "Preserve react-best-practices/rules and compiled AGENTS.md. Web-design-guidelines fetches a live external command.md, which is not pinned by this repository commit.",
+        "The hydration example contains a literal inline script; never interpolate untrusted input into dangerouslySetInnerHTML and respect the target CSP."
+      ],
+      "entrypoints": [
+        "README.md",
+        "skills/react-best-practices/SKILL.md",
+        "skills/react-best-practices/AGENTS.md",
+        "skills/web-design-guidelines/SKILL.md"
+      ],
+      "skill_paths": [
+        "skills/react-best-practices/SKILL.md",
+        "skills/web-design-guidelines/SKILL.md"
+      ],
+      "install_commands": [
+        "npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices",
+        "npx skills add vercel-labs/agent-skills --skill web-design-guidelines"
+      ],
+      "setup_scope": "shared on-demand source; selected project or isolated runtime only",
+      "agent_setup": {
+        "action": "read-guidance",
+        "working_directory": "Read from the pinned checkout; apply only in the selected target project.",
+        "read_first": [
+          "toolkit read vercel-agent-skills README.md"
+        ],
+        "install": "Source download and retrieval require no upstream runtime. Registration commands are alternatives, not an execution queue; do not install the entire collection globally.",
+        "configure": "Keep framework triggers narrow. Fetch and review current web-interface guidelines as untrusted reference data when using that audit; prioritize measured performance and existing project conventions.",
+        "verify": "Check selected rules and references resolve; validate changes with the target React build/tests and accessibility checks.",
+        "record_result": "Record actual runtime and authentication checks in local project notes; source availability is not runtime readiness.",
+        "source_revision": "063bee94c3f4df8453406c830b0a7df0f2860278"
+      }
     },
     {
       "id": "voicestudio",
